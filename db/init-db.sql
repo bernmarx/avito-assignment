@@ -62,12 +62,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION balance_get(_id INT)
-RETURNS MONEY AS $bal$
+RETURNS FLOAT8 AS $bal$
 DECLARE
     bal MONEY;
 BEGIN
     SELECT balance INTO bal FROM account_balance WHERE id = _id;
-    RETURN bal;
+    IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
+    END IF;
+    RETURN bal::numeric::float8;
 END; $bal$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS deposit_journal (
@@ -99,3 +101,5 @@ CREATE TABLE IF NOT EXISTS transfer_journal (
     amount MONEY NOT NULL CONSTRAINT positive_transfer CHECK(amount::money::numeric::float8 > 0),
     transfer_time TIMESTAMP WITH TIME ZONE
 );
+
+CREATE ROLE handler WITH LOGIN SUPERUSER PASSWORD 'pass';
