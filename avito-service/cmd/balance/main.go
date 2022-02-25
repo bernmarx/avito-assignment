@@ -15,7 +15,8 @@ func main() {
 	http.HandleFunc("/deposit", balancehadler.Deposit)
 	http.HandleFunc("/withdraw", balancehadler.Withdraw)
 	http.HandleFunc("/transfer", balancehadler.Transfer)
-	http.HandleFunc("/get", balancehadler.Get)
+	http.HandleFunc("/getbalance", balancehadler.GetBalance)
+	http.HandleFunc("/gettransactions", balancehadler.GetTransactions)
 
 	log.Println("Starting server at " + port)
 
