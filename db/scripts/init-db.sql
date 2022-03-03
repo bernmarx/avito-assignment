@@ -16,7 +16,7 @@ BEGIN
     ON CONFLICT (id)
     DO
         UPDATE SET balance = EXCLUDED.balance + account_balance.balance;
-    
+
     INSERT INTO deposit_journal (account_id, amount, deposit_time)
     VALUES (_id, deposit::numeric::money, now());
 COMMIT;
@@ -32,14 +32,14 @@ BEGIN
         WHERE id = _id;
     IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
     END IF;
-    
+
     INSERT INTO withdraw_journal (account_id, amount, withdraw_time)
     VALUES (_id, withdraw::numeric::money, now());
 COMMIT;
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE balance_transfer(sender INT, reciever INT, amount FLOAT8)
+CREATE OR REPLACE PROCEDURE balance_transfer(sender INT, receiver INT, amount FLOAT8)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -51,12 +51,12 @@ BEGIN
 
     UPDATE account_balance
         SET balance = balance + amount::numeric::money
-        WHERE id = reciever;    
+        WHERE id = receiver;
     IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
     END IF;
-    
-    INSERT INTO transfer_journal (sender_id, reciever_id, amount, transfer_time)
-    VALUES (sender, reciever, amount::numeric::money, now());
+
+    INSERT INTO transfer_journal (sender_id, receiver_id, amount, transfer_time)
+    VALUES (sender, receiver, amount::numeric::money, now());
 COMMIT;
 END;
 $$;
@@ -97,7 +97,7 @@ CREATE INDEX IF NOT EXISTS idx_withdraw_journal ON withdraw_journal (
 CREATE TABLE IF NOT EXISTS transfer_journal (
     transfer_id SERIAL PRIMARY KEY,
     sender_id INT,
-    reciever_id INT,
+    receiver_id INT,
     amount MONEY NOT NULL CONSTRAINT positive_transfer CHECK(amount::money::numeric::float8 > 0),
     transfer_time TIMESTAMP WITH TIME ZONE
 );
