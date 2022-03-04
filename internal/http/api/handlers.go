@@ -2,11 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"log"
+	"net/http"
+	"strconv"
+
 	"github.com/bernmarx/avito-assignment/internal/domain/balance"
 	"github.com/bernmarx/avito-assignment/internal/domain/conversion"
 	"github.com/bernmarx/avito-assignment/internal/exchangerateapi"
-	"log"
-	"net/http"
+	"github.com/gorilla/mux"
 )
 
 type Service struct {
@@ -79,7 +82,7 @@ func (s *Service) GetTransferHandler() func(w http.ResponseWriter, r *http.Reque
 func (s *Service) GetBalanceHandler() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
-		var data UserBalance
+		var data RequestData
 		json.NewDecoder(r.Body).Decode(&data)
 
 		b := balance.NewBalance()
@@ -117,6 +120,56 @@ func (s *Service) GetBalanceHandler() func(w http.ResponseWriter, r *http.Reques
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		w.Write(j)
+	}
+}
+
+func (s *Service) GetTransactionHistoryHandler() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		var data RequestData
+		json.NewDecoder(r.Body).Decode(&data)
+
+		b := balance.NewBalance()
+
+		j, err := b.GetTransactionHistory(data.ID)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(j)
+	}
+}
+
+func (s *Service) GetTransactionHistoryPageHandler() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		var data RequestData
+		json.NewDecoder(r.Body).Decode(&data)
+
+		variables := mux.Vars(r)
+		page64, err := strconv.ParseInt(variables["page"], 10, 0)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		page := int(page64)
+
+		b := balance.NewBalance()
+
+		j, err := b.GetTransactionHistoryPage(data.ID, data.Sort, page)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 		w.Write(j)
 	}
 }

@@ -11,7 +11,7 @@ import (
 func TestDeposit(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	m := NewMockdataAccess(ctrl)
+	m := NewMockstorageIfc(ctrl)
 
 	m.EXPECT().Deposit(int(123), float32(10.0)).Return(nil)
 
@@ -38,7 +38,7 @@ func TestDeposit(t *testing.T) {
 func TestWithdraw(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	m := NewMockdataAccess(ctrl)
+	m := NewMockstorageIfc(ctrl)
 
 	m.EXPECT().Withdraw(int(123), float32(10.0)).Return(nil)
 
@@ -65,7 +65,7 @@ func TestWithdraw(t *testing.T) {
 func TestTransfer(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	m := NewMockdataAccess(ctrl)
+	m := NewMockstorageIfc(ctrl)
 
 	m.EXPECT().Transfer(int(12), int(34), float32(100.0)).Return(nil)
 
@@ -96,7 +96,7 @@ func TestTransfer(t *testing.T) {
 func TestGetBalance(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	m := NewMockdataAccess(ctrl)
+	m := NewMockstorageIfc(ctrl)
 
 	m.EXPECT().GetBalance(int(10)).Return(float32(24.0), nil)
 

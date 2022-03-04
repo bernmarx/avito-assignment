@@ -5,35 +5,36 @@
 package balance
 
 import (
+	storage "github.com/bernmarx/avito-assignment/internal/storage"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
 
-// MockdataAccess is a mock of dataAccess interface
-type MockdataAccess struct {
+// MockstorageIfc is a mock of storageIfc interface
+type MockstorageIfc struct {
 	ctrl     *gomock.Controller
-	recorder *MockdataAccessMockRecorder
+	recorder *MockstorageIfcMockRecorder
 }
 
-// MockdataAccessMockRecorder is the mock recorder for MockdataAccess
-type MockdataAccessMockRecorder struct {
-	mock *MockdataAccess
+// MockstorageIfcMockRecorder is the mock recorder for MockstorageIfc
+type MockstorageIfcMockRecorder struct {
+	mock *MockstorageIfc
 }
 
-// NewMockdataAccess creates a new mock instance
-func NewMockdataAccess(ctrl *gomock.Controller) *MockdataAccess {
-	mock := &MockdataAccess{ctrl: ctrl}
-	mock.recorder = &MockdataAccessMockRecorder{mock}
+// NewMockstorageIfc creates a new mock instance
+func NewMockstorageIfc(ctrl *gomock.Controller) *MockstorageIfc {
+	mock := &MockstorageIfc{ctrl: ctrl}
+	mock.recorder = &MockstorageIfcMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockdataAccess) EXPECT() *MockdataAccessMockRecorder {
+func (m *MockstorageIfc) EXPECT() *MockstorageIfcMockRecorder {
 	return m.recorder
 }
 
 // Deposit mocks base method
-func (m *MockdataAccess) Deposit(id int, amount float32) error {
+func (m *MockstorageIfc) Deposit(id int, amount float32) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Deposit", id, amount)
 	ret0, _ := ret[0].(error)
@@ -41,13 +42,13 @@ func (m *MockdataAccess) Deposit(id int, amount float32) error {
 }
 
 // Deposit indicates an expected call of Deposit
-func (mr *MockdataAccessMockRecorder) Deposit(id, amount interface{}) *gomock.Call {
+func (mr *MockstorageIfcMockRecorder) Deposit(id, amount interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deposit", reflect.TypeOf((*MockdataAccess)(nil).Deposit), id, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deposit", reflect.TypeOf((*MockstorageIfc)(nil).Deposit), id, amount)
 }
 
 // Withdraw mocks base method
-func (m *MockdataAccess) Withdraw(id int, amount float32) error {
+func (m *MockstorageIfc) Withdraw(id int, amount float32) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Withdraw", id, amount)
 	ret0, _ := ret[0].(error)
@@ -55,13 +56,13 @@ func (m *MockdataAccess) Withdraw(id int, amount float32) error {
 }
 
 // Withdraw indicates an expected call of Withdraw
-func (mr *MockdataAccessMockRecorder) Withdraw(id, amount interface{}) *gomock.Call {
+func (mr *MockstorageIfcMockRecorder) Withdraw(id, amount interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Withdraw", reflect.TypeOf((*MockdataAccess)(nil).Withdraw), id, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Withdraw", reflect.TypeOf((*MockstorageIfc)(nil).Withdraw), id, amount)
 }
 
 // Transfer mocks base method
-func (m *MockdataAccess) Transfer(senderID, receiverID int, amount float32) error {
+func (m *MockstorageIfc) Transfer(senderID, receiverID int, amount float32) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Transfer", senderID, receiverID, amount)
 	ret0, _ := ret[0].(error)
@@ -69,13 +70,13 @@ func (m *MockdataAccess) Transfer(senderID, receiverID int, amount float32) erro
 }
 
 // Transfer indicates an expected call of Transfer
-func (mr *MockdataAccessMockRecorder) Transfer(senderID, receiverID, amount interface{}) *gomock.Call {
+func (mr *MockstorageIfcMockRecorder) Transfer(senderID, receiverID, amount interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Transfer", reflect.TypeOf((*MockdataAccess)(nil).Transfer), senderID, receiverID, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Transfer", reflect.TypeOf((*MockstorageIfc)(nil).Transfer), senderID, receiverID, amount)
 }
 
 // GetBalance mocks base method
-func (m *MockdataAccess) GetBalance(id int) (float32, error) {
+func (m *MockstorageIfc) GetBalance(id int) (float32, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBalance", id)
 	ret0, _ := ret[0].(float32)
@@ -84,7 +85,37 @@ func (m *MockdataAccess) GetBalance(id int) (float32, error) {
 }
 
 // GetBalance indicates an expected call of GetBalance
-func (mr *MockdataAccessMockRecorder) GetBalance(id interface{}) *gomock.Call {
+func (mr *MockstorageIfcMockRecorder) GetBalance(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBalance", reflect.TypeOf((*MockdataAccess)(nil).GetBalance), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBalance", reflect.TypeOf((*MockstorageIfc)(nil).GetBalance), id)
+}
+
+// GetTransactionHistory mocks base method
+func (m *MockstorageIfc) GetTransactionHistory(id int) (storage.TransactionHistory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionHistory", id)
+	ret0, _ := ret[0].(storage.TransactionHistory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionHistory indicates an expected call of GetTransactionHistory
+func (mr *MockstorageIfcMockRecorder) GetTransactionHistory(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionHistory", reflect.TypeOf((*MockstorageIfc)(nil).GetTransactionHistory), id)
+}
+
+// GetTransactionHistoryPage mocks base method
+func (m *MockstorageIfc) GetTransactionHistoryPage(id int, sort string, page int) (storage.TransactionHistory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionHistoryPage", id, sort, page)
+	ret0, _ := ret[0].(storage.TransactionHistory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionHistoryPage indicates an expected call of GetTransactionHistoryPage
+func (mr *MockstorageIfcMockRecorder) GetTransactionHistoryPage(id, sort, page interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionHistoryPage", reflect.TypeOf((*MockstorageIfc)(nil).GetTransactionHistoryPage), id, sort, page)
 }

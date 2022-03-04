@@ -8,6 +8,8 @@ type storageIfc interface {
 	Withdraw(id int, amount float32) error
 	Transfer(senderID int, receiverID int, amount float32) error
 	GetBalance(id int) (float32, error)
+	GetTransactionHistory(id int) (storage.TransactionHistory, error)
+	GetTransactionHistoryPage(id int, sort string, page int) (storage.TransactionHistory, error)
 }
 
 type Balance struct {

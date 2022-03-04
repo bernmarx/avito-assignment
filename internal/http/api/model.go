@@ -2,12 +2,13 @@ package api
 
 import "encoding/json"
 
-type UserBalance struct {
+type RequestData struct {
 	ID      int     `json:"id"`
 	Balance float32 `json:"balance"`
+	Sort    string  `json:"sort"`
 }
 
-func (u *UserBalance) GetJSON() ([]byte, error) {
+func (u *RequestData) GetJSON() ([]byte, error) {
 	j, err := json.Marshal(u)
 	return j, err
 }

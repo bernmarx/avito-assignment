@@ -55,9 +55,10 @@ func NewStorage() (*Storage, error) {
 }
 
 type TransactionHistory struct {
-	Dh []DepositHistory
-	Wh []WithdrawalHistory
-	Th []TransferHistory
+	Dh []DepositHistory    `json:"deposit_history"`
+	Wh []WithdrawalHistory `json:"withdrawal_history"`
+	Sh []SendHistory       `json:"send_history"`
+	Rh []ReceiveHistory    `json:"receive_history"`
 }
 
 type DepositHistory struct {
@@ -68,8 +69,13 @@ type WithdrawalHistory struct {
 	Time   string
 	Amount float32
 }
-type TransferHistory struct {
-	Receiver int
+type SendHistory struct {
+	ReceiverID int
+	Time       string
+	Amount     float32
+}
+type ReceiveHistory struct {
+	SenderID int
 	Time     string
 	Amount   float32
 }
