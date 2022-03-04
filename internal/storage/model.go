@@ -62,22 +62,22 @@ type TransactionHistory struct {
 }
 
 type DepositHistory struct {
-	Time   string
-	Amount float32
+	Time   string  `json:"time"`
+	Amount float32 `json:"amount"`
 }
 type WithdrawalHistory struct {
-	Time   string
-	Amount float32
+	Time   string  `json:"time"`
+	Amount float32 `json:"amount"`
 }
 type SendHistory struct {
-	ReceiverID int
-	Time       string
-	Amount     float32
+	ReceiverID int     `json:"receiver_id"`
+	Time       string  `json:"time"`
+	Amount     float32 `json:"amount"`
 }
 type ReceiveHistory struct {
-	SenderID int
-	Time     string
-	Amount   float32
+	SenderID int     `json:"sender_id"`
+	Time     string  `json:"time"`
+	Amount   float32 `json:"amount"`
 }
 
 func (t *TransactionHistory) GetJSON() ([]byte, error) {
