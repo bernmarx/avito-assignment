@@ -1,9 +1,14 @@
+//go:generate mockgen -source $GOFILE -destination ./exchangerate_mock.go -package $GOPACKAGE
 package exchangerateapi
 
 import (
 	"encoding/json"
 	"net/http"
 )
+
+type httpClient interface {
+	Get(url string) (*http.Response, error)
+}
 
 type ExchangeRate struct {
 	httpClient
