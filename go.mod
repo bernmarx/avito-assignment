@@ -3,6 +3,7 @@ module github.com/bernmarx/avito-assignment
 go 1.16
 
 require (
+	github.com/getsentry/sentry-go v0.12.0
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/lib/pq v1.10.4

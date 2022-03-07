@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
@@ -23,7 +25,6 @@ func connectToDB() (*sql.DB, error) {
 	connData := "host=" + os.Getenv("DB_HOST") + " " + "port=" + os.Getenv("DB_PORT")
 	connData = connData + " " + "user=" + os.Getenv("DB_USER") + " " + "password=" + os.Getenv("DB_PASSWORD")
 	connData = connData + " " + "dbname=" + os.Getenv("DB_NAME") + " " + "sslmode=" + os.Getenv("DB_SSLMODE")
-	log.Println(connData)
 
 	db, err := sql.Open("postgres", connData)
 	if err != nil {
@@ -37,8 +38,27 @@ func connectToDB() (*sql.DB, error) {
 
 func main() {
 	db, err := connectToDB()
+
+	//If connection to Postgres failed, wait for 3 seconds and try again
 	if err != nil {
-		log.Fatalln(err)
+		time.Sleep(time.Second * 3)
+
+		//If connection still fails, stop service
+		db, err = connectToDB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn:         os.Getenv("SENTRY_DSN"),
+		Environment: "",
+		Release:     "my-project-name@1.0.0",
+		Debug:       true,
+	})
+
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
 	}
 
 	s := balance.NewStorage(db)
