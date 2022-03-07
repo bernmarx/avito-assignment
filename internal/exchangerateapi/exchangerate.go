@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-type httpClient interface {
+type HttpClient interface {
 	Get(url string) (*http.Response, error)
 }
 
 type ExchangeRate struct {
-	httpClient
+	HttpClient
 	url    string
 	curPos int
 }
@@ -20,8 +20,8 @@ type rate struct {
 	Value float32 `json:"conversion_rate"`
 }
 
-func NewExchangeRate(_url string, _curPos int) *ExchangeRate {
-	return &ExchangeRate{httpClient: http.DefaultClient, url: _url, curPos: _curPos}
+func NewExchangeRate(c HttpClient, _url string, _curPos int) *ExchangeRate {
+	return &ExchangeRate{HttpClient: c, url: _url, curPos: _curPos}
 }
 
 func (e *ExchangeRate) GetExchangeRate(cur string) (float32, error) {

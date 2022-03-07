@@ -47,7 +47,7 @@ func main() {
 
 	eRcurPos, _ := strconv.ParseInt(os.Getenv("EXCHANGE_RATE_API_CUR_POS"), 10, 0)
 
-	eR := exchangerateapi.NewExchangeRate(eRurl, int(eRcurPos))
+	eR := exchangerateapi.NewExchangeRate(http.DefaultClient, eRurl, int(eRcurPos))
 
 	service := api.NewService()
 
