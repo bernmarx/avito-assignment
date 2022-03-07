@@ -1,4 +1,4 @@
-package storage
+package balance
 
 import (
 	"errors"
@@ -6,19 +6,19 @@ import (
 	"strconv"
 )
 
-func (s *Storage) Deposit(id int, amount float32) error {
+func (s *Storage) DepositMoney(id int, amount float32) error {
 	sqlstmt := `call balance_deposit($1, $2)`
 	_, err := s.Exec(sqlstmt, id, amount)
 	return err
 }
 
-func (s *Storage) Withdraw(id int, amount float32) error {
+func (s *Storage) WithdrawMoney(id int, amount float32) error {
 	sqlstmt := `call balance_withdraw($1, $2)`
 	_, err := s.Exec(sqlstmt, id, amount)
 	return err
 }
 
-func (s *Storage) Transfer(senderID int, receiverID int, amount float32) error {
+func (s *Storage) TransferMoney(senderID int, receiverID int, amount float32) error {
 	sqlstmt := `call balance_transfer($1, $2, $3)`
 	_, err := s.Exec(sqlstmt, senderID, receiverID, amount)
 	return err

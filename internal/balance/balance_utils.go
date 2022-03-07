@@ -2,12 +2,10 @@ package balance
 
 import (
 	"errors"
-	"log"
 )
 
 func checkID(id int) error {
 	if id <= 0 {
-		log.Println("found invalid ID")
 		return errors.New("missing or invalid ID")
 	}
 
@@ -15,7 +13,6 @@ func checkID(id int) error {
 }
 func checkAmount(amount float32) error {
 	if amount <= 0 {
-		log.Println("found invalid amount")
 		return errors.New("invalid amount")
 	}
 

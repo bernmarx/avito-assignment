@@ -1,57 +1,23 @@
 //go:generate mockgen -source $GOFILE -destination ./storage_mock.go -package $GOPACKAGE
-package storage
+package balance
 
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
-	"os"
-
-	_ "github.com/lib/pq"
 )
 
-type storage interface {
+type database interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	QueryRow(query string, args ...interface{}) *sql.Row
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
-type storageRow interface {
-	Scan(dest ...interface{}) error
-}
-
-type storageRows interface {
-	Next() bool
-	Scan(dest ...interface{}) error
-}
-
 type Storage struct {
-	storage
-	storageRow
-	storageRows
+	database
 }
 
-func NewStorage() (*Storage, error) {
-	connData := "host=" + os.Getenv("DB_HOST") + " " + "port=" + os.Getenv("DB_PORT")
-	connData = connData + " " + "user=" + os.Getenv("DB_USER") + " " + "password=" + os.Getenv("DB_PASSWORD")
-	connData = connData + " " + "dbname=" + os.Getenv("DB_NAME") + " " + "sslmode=" + os.Getenv("DB_SSLMODE")
-	log.Println(connData)
-
-	db, err := sql.Open("postgres", connData)
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
-
-	s := Storage{storage: db, storageRow: &sql.Row{}, storageRows: &sql.Rows{}}
-
-	return &s, nil
+func NewStorage(db database) *Storage {
+	return &Storage{database: db}
 }
 
 type TransactionHistory struct {

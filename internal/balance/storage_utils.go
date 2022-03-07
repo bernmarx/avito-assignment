@@ -1,4 +1,4 @@
-package storage
+package balance
 
 func GetSqlStmtsPage(sort string) []string {
 	stmts := make([]string, 4)

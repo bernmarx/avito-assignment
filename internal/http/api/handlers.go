@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bernmarx/avito-assignment/internal/domain/balance"
-	"github.com/bernmarx/avito-assignment/internal/domain/conversion"
+	"github.com/bernmarx/avito-assignment/internal/balance"
+	"github.com/bernmarx/avito-assignment/internal/converter"
 	"github.com/bernmarx/avito-assignment/internal/exchangerateapi"
 	"github.com/gorilla/mux"
 )
@@ -19,15 +19,15 @@ func NewService() *Service {
 	return &Service{}
 }
 
-func (s *Service) GetDepositHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetDepositHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
-		err := b.Deposit(data.ID, data.Amount)
+		err := b.MakeDeposit(data.ID, data.Amount)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -39,15 +39,15 @@ func (s *Service) GetDepositHandler() func(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (s *Service) GetWithdrawHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetWithdrawHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
-		err := b.Withdraw(data.ID, data.Amount)
+		err := b.MakeWithdraw(data.ID, data.Amount)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -59,15 +59,15 @@ func (s *Service) GetWithdrawHandler() func(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (s *Service) GetTransferHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetTransferHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
-		err := b.Transfer(data.ID, data.Receiver, data.Amount)
+		err := b.MakeTransfer(data.ID, data.Receiver, data.Amount)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -79,13 +79,13 @@ func (s *Service) GetTransferHandler() func(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (s *Service) GetBalanceHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetBalanceHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data RequestData
 		json.NewDecoder(r.Body).Decode(&data)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
 		var err error
 		data.Balance, err = b.GetBalance(data.ID)
@@ -99,7 +99,7 @@ func (s *Service) GetBalanceHandler() func(w http.ResponseWriter, r *http.Reques
 		currency, exists := query["currency"]
 
 		if exists && len(currency) == 1 {
-			c := conversion.NewConverter(exchangerateapi.NewExchangeRate())
+			c := converter.NewConverter(exchangerateapi.NewExchangeRate())
 			data.Balance, err = c.ConvertCurrency(data.Balance, currency[0])
 			if err != nil {
 				log.Println(err.Error())
@@ -124,13 +124,13 @@ func (s *Service) GetBalanceHandler() func(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (s *Service) GetTransactionHistoryHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetTransactionHistoryHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data RequestData
 		json.NewDecoder(r.Body).Decode(&data)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
 		j, err := b.GetTransactionHistory(data.ID)
 		if err != nil {
@@ -144,7 +144,7 @@ func (s *Service) GetTransactionHistoryHandler() func(w http.ResponseWriter, r *
 	}
 }
 
-func (s *Service) GetTransactionHistoryPageHandler() func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetTransactionHistoryPageHandler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		var data RequestData
@@ -160,7 +160,7 @@ func (s *Service) GetTransactionHistoryPageHandler() func(w http.ResponseWriter,
 
 		page := int(page64)
 
-		b := balance.NewBalance()
+		b := balance.NewBalance(strg)
 
 		j, err := b.GetTransactionHistoryPage(data.ID, data.Sort, page)
 		if err != nil {

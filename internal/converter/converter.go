@@ -1,21 +1,21 @@
 //go:generate mockgen -source $GOFILE -destination ./conversionrate_mock.go -package $GOPACKAGE
-package conversion
+package converter
 
 import (
 	"errors"
 	"os"
 )
 
-type conversionRate interface {
+type ExchangeRateGetter interface {
 	GetExchangeRate(baseCur string, cur string) (float32, error)
 }
 
 type Converter struct {
-	conversionRate
+	ExchangeRateGetter
 }
 
-func NewConverter(e conversionRate) *Converter {
-	return &Converter{conversionRate: e}
+func NewConverter(e ExchangeRateGetter) *Converter {
+	return &Converter{ExchangeRateGetter: e}
 }
 
 func (c *Converter) ConvertCurrency(money float32, curr string) (float32, error) {
