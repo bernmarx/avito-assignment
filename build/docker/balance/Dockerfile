@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go test ./... -v
+RUN go test ./... -cover
 WORKDIR /usr/src/balance/cmd/balance
 RUN go build -v -o /usr/local/bin/balance
 
