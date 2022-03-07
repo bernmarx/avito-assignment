@@ -8,8 +8,13 @@ type RequestData struct {
 	Sort    string  `json:"sort"`
 }
 
-func (u *RequestData) GetJSON() ([]byte, error) {
-	j, err := json.Marshal(u)
+type Account struct {
+	ID      int     `json:"id"`
+	Balance float32 `json:"balance"`
+}
+
+func (a *Account) GetJSON() ([]byte, error) {
+	j, err := json.Marshal(a)
 	return j, err
 }
 

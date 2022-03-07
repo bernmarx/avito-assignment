@@ -118,3 +118,41 @@ func (mr *MockStorageAccessMockRecorder) GetTransactionHistoryPage(id, sort, pag
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionHistoryPage", reflect.TypeOf((*MockStorageAccess)(nil).GetTransactionHistoryPage), id, sort, page)
 }
+
+// MockExchangeRateGetter is a mock of ExchangeRateGetter interface
+type MockExchangeRateGetter struct {
+	ctrl     *gomock.Controller
+	recorder *MockExchangeRateGetterMockRecorder
+}
+
+// MockExchangeRateGetterMockRecorder is the mock recorder for MockExchangeRateGetter
+type MockExchangeRateGetterMockRecorder struct {
+	mock *MockExchangeRateGetter
+}
+
+// NewMockExchangeRateGetter creates a new mock instance
+func NewMockExchangeRateGetter(ctrl *gomock.Controller) *MockExchangeRateGetter {
+	mock := &MockExchangeRateGetter{ctrl: ctrl}
+	mock.recorder = &MockExchangeRateGetterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockExchangeRateGetter) EXPECT() *MockExchangeRateGetterMockRecorder {
+	return m.recorder
+}
+
+// GetExchangeRate mocks base method
+func (m *MockExchangeRateGetter) GetExchangeRate(cur string) (float32, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetExchangeRate", cur)
+	ret0, _ := ret[0].(float32)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetExchangeRate indicates an expected call of GetExchangeRate
+func (mr *MockExchangeRateGetterMockRecorder) GetExchangeRate(cur interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExchangeRate", reflect.TypeOf((*MockExchangeRateGetter)(nil).GetExchangeRate), cur)
+}

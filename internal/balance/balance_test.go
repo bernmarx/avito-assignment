@@ -13,9 +13,11 @@ func TestMakeDeposit(t *testing.T) {
 
 	m := NewMockStorageAccess(ctrl)
 
+	meR := NewMockExchangeRateGetter(ctrl)
+
 	m.EXPECT().DepositMoney(int(123), float32(10.0)).Return(nil)
 
-	b := Balance{m}
+	b := Balance{m, meR}
 	err := b.MakeDeposit(123, 10.0)
 
 	assert.Nil(t, err)
@@ -40,9 +42,11 @@ func TestMakeWithdraw(t *testing.T) {
 
 	m := NewMockStorageAccess(ctrl)
 
+	meR := NewMockExchangeRateGetter(ctrl)
+
 	m.EXPECT().WithdrawMoney(int(123), float32(10.0)).Return(nil)
 
-	b := Balance{m}
+	b := Balance{m, meR}
 	err := b.MakeWithdraw(123, 10.0)
 
 	assert.Nil(t, err)
@@ -67,9 +71,11 @@ func TestMakeTransfer(t *testing.T) {
 
 	m := NewMockStorageAccess(ctrl)
 
+	meR := NewMockExchangeRateGetter(ctrl)
+
 	m.EXPECT().TransferMoney(int(12), int(34), float32(100.0)).Return(nil)
 
-	b := Balance{m}
+	b := Balance{m, meR}
 	err := b.MakeTransfer(12, 34, 100.0)
 
 	assert.Nil(t, err)
@@ -98,9 +104,11 @@ func TestGetBalance(t *testing.T) {
 
 	m := NewMockStorageAccess(ctrl)
 
+	meR := NewMockExchangeRateGetter(ctrl)
+
 	m.EXPECT().GetBalance(int(10)).Return(float32(24.0), nil)
 
-	b := Balance{m}
+	b := Balance{m, meR}
 
 	bal, err := b.GetBalance(10)
 

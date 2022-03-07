@@ -10,10 +10,15 @@ type StorageAccess interface {
 	GetTransactionHistoryPage(id int, sort string, page int) (TransactionHistory, error)
 }
 
-type Balance struct {
-	Storage StorageAccess
+type ExchangeRateGetter interface {
+	GetExchangeRate(cur string) (float32, error)
 }
 
-func NewBalance(s StorageAccess) *Balance {
-	return &Balance{s}
+type Balance struct {
+	Storage         StorageAccess
+	ExchangeRateApi ExchangeRateGetter
+}
+
+func NewBalance(s StorageAccess, eR ExchangeRateGetter) *Balance {
+	return &Balance{s, eR}
 }

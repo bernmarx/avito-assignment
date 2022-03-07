@@ -3,33 +3,33 @@ package exchangerateapi
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 )
 
 type ExchangeRate struct {
 	httpClient
+	url    string
+	curPos int
 }
 
-func NewExchangeRate() *ExchangeRate {
-	return &ExchangeRate{httpClient: http.DefaultClient}
+type rate struct {
+	Value float32 `json:"conversion_rate"`
 }
 
-func (e *ExchangeRate) GetExchangeRate(baseCur string, cur string) (float32, error) {
-	exchangeAPIkey := os.Getenv("ER_API_KEY")
-	resp, err := e.Get("https://v6.exchangerate-api.com/v6/" + exchangeAPIkey + "/pair/" +
-		baseCur + "/" + cur)
+func NewExchangeRate(_url string, _curPos int) *ExchangeRate {
+	return &ExchangeRate{httpClient: http.DefaultClient, url: _url, curPos: _curPos}
+}
+
+func (e *ExchangeRate) GetExchangeRate(cur string) (float32, error) {
+	url := e.url[:e.curPos] + cur + e.url[e.curPos:]
+	resp, err := e.Get(url)
 	if err != nil {
 		return 0.0, err
 	}
 	defer resp.Body.Close()
 
-	type conversion struct {
-		Rate float32 `json:"conversion_rate"`
-	}
+	r := rate{}
 
-	var cr conversion
+	err = json.NewDecoder(resp.Body).Decode(&r)
 
-	err = json.NewDecoder(resp.Body).Decode(&cr)
-
-	return cr.Rate, err
+	return r.Value, err
 }

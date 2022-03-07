@@ -5,11 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
 	"github.com/bernmarx/avito-assignment/internal/balance"
+	"github.com/bernmarx/avito-assignment/internal/exchangerateapi"
 	"github.com/bernmarx/avito-assignment/internal/http/api"
 )
 
@@ -41,16 +43,22 @@ func main() {
 
 	s := balance.NewStorage(db)
 
+	eRurl := os.Getenv("EXCHANGE_RATE_API_URL")
+
+	eRcurPos, _ := strconv.ParseInt(os.Getenv("EXCHANGE_RATE_API_CUR_POS"), 10, 0)
+
+	eR := exchangerateapi.NewExchangeRate(eRurl, int(eRcurPos))
+
 	service := api.NewService()
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/deposit", service.GetDepositHandler(s)).Methods("POST")
-	r.HandleFunc("/withdraw", service.GetWithdrawHandler(s)).Methods("POST")
-	r.HandleFunc("/transfer", service.GetTransferHandler(s)).Methods("POST")
-	r.HandleFunc("/balance", service.GetBalanceHandler(s)).Methods("GET")
-	r.HandleFunc("/history", service.GetTransactionHistoryHandler(s)).Methods("GET")
-	r.HandleFunc("/history/{page}", service.GetTransactionHistoryPageHandler(s)).Methods("GET")
+	r.HandleFunc("/deposit", service.GetDepositHandler(s, eR)).Methods("POST")
+	r.HandleFunc("/withdraw", service.GetWithdrawHandler(s, eR)).Methods("POST")
+	r.HandleFunc("/transfer", service.GetTransferHandler(s, eR)).Methods("POST")
+	r.HandleFunc("/balance", service.GetBalanceHandler(s, eR)).Methods("GET")
+	r.HandleFunc("/history", service.GetTransactionHistoryHandler(s, eR)).Methods("GET")
+	r.HandleFunc("/history/{page}", service.GetTransactionHistoryPageHandler(s, eR)).Methods("GET")
 
 	http.Handle("/", r)
 	log.Println("Starting server at " + port)
