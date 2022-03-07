@@ -120,6 +120,8 @@ func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.Excha
 			acc.Balance *= rate
 		}
 
+		acc.ID = rd.ID
+
 		w.WriteHeader(http.StatusOK)
 		j, err := acc.GetJSON()
 		if err != nil {

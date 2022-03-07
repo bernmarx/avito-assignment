@@ -61,10 +61,11 @@ func main() {
 	r.HandleFunc("/history/{page}", service.GetTransactionHistoryPageHandler(s, eR)).Methods("GET")
 
 	http.Handle("/", r)
-	log.Println("Starting server at " + port)
 
 	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+
+	log.Println("Server was started at " + port + " and is listening")
 }
