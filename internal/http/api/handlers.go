@@ -21,6 +21,7 @@ func NewService() *Service {
 func (s *Service) GetDepositHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
@@ -41,6 +42,7 @@ func (s *Service) GetDepositHandler(strg balance.StorageAccess, eR balance.Excha
 func (s *Service) GetWithdrawHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
@@ -61,6 +63,7 @@ func (s *Service) GetWithdrawHandler(strg balance.StorageAccess, eR balance.Exch
 func (s *Service) GetTransferHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var data Transaction
 		json.NewDecoder(r.Body).Decode(&data)
 
@@ -81,6 +84,7 @@ func (s *Service) GetTransferHandler(strg balance.StorageAccess, eR balance.Exch
 func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var rd RequestData
 		var acc Account
 		json.NewDecoder(r.Body).Decode(&rd)
@@ -98,6 +102,7 @@ func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.Excha
 		query := r.URL.Query()
 		currency, exists := query["currency"]
 
+		//Returns error if there is more than 1 currency value
 		if exists && (len(currency) != 1) {
 			log.Println("Invalid conversion query")
 			http.Error(w, "Invalid conversion query", http.StatusBadRequest)
@@ -129,6 +134,7 @@ func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.Excha
 func (s *Service) GetTransactionHistoryHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var data RequestData
 		json.NewDecoder(r.Body).Decode(&data)
 
@@ -149,6 +155,7 @@ func (s *Service) GetTransactionHistoryHandler(strg balance.StorageAccess, eR ba
 func (s *Service) GetTransactionHistoryPageHandler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+
 		var rd RequestData
 		json.NewDecoder(r.Body).Decode(&rd)
 

@@ -19,6 +19,9 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Ignore GoLand stuff
 .idea
 
+# Ignore persistent database data
 database
