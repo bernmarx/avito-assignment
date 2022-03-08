@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/golang/mock/gomock"
+	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,6 +38,7 @@ func TestMakeDeposit(t *testing.T) {
 }
 
 func TestMakeWithdraw(t *testing.T) {
+
 	ctrl := gomock.NewController(t)
 
 	m := NewMockStorageAccess(ctrl)

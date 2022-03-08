@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/bernmarx/avito-assignment/internal/balance"
+	"github.com/bernmarx/avito-assignment/internal/serviceerrors"
 	"github.com/gorilla/mux"
 )
 
@@ -29,8 +31,16 @@ func (s *Service) GetDepositHandler(strg balance.StorageAccess, eR balance.Excha
 
 		err := b.MakeDeposit(data.ID, data.Amount)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -50,8 +60,16 @@ func (s *Service) GetWithdrawHandler(strg balance.StorageAccess, eR balance.Exch
 
 		err := b.MakeWithdraw(data.ID, data.Amount)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -71,8 +89,16 @@ func (s *Service) GetTransferHandler(strg balance.StorageAccess, eR balance.Exch
 
 		err := b.MakeTransfer(data.ID, data.Receiver, data.Amount)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -94,8 +120,16 @@ func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.Excha
 		var err error
 		acc.Balance, err = b.GetBalance(rd.ID)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -126,7 +160,7 @@ func (s *Service) GetBalanceHandler(strg balance.StorageAccess, eR balance.Excha
 		j, err := acc.GetJSON()
 		if err != nil {
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Write(j)
@@ -144,8 +178,16 @@ func (s *Service) GetTransactionHistoryHandler(strg balance.StorageAccess, eR ba
 
 		j, err := b.GetTransactionHistory(data.ID)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -180,8 +222,16 @@ func (s *Service) GetTransactionHistoryPageHandler(strg balance.StorageAccess, e
 
 		j, err := b.GetTransactionHistoryPage(rd.ID, rd.Sort, page)
 		if err != nil {
+			var sErr *serviceerrors.Error
+
+			if errors.As(err, &sErr) {
+				log.Println(sErr.Msg)
+				http.Error(w, sErr.Msg, sErr.Code)
+				return
+			}
+
 			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 

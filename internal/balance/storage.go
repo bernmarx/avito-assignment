@@ -4,24 +4,53 @@ import (
 	"errors"
 	"os"
 	"strconv"
+	"strings"
+
+	"github.com/bernmarx/avito-assignment/internal/serviceerrors"
 )
 
 func (s *Storage) DepositMoney(id int, amount float32) error {
 	sqlstmt := `call balance_deposit($1, $2)`
 	_, err := s.Exec(sqlstmt, id, amount)
-	return err
+	if err != nil {
+		return serviceerrors.New(err.Error(), 503)
+	}
+
+	return nil
 }
 
 func (s *Storage) WithdrawMoney(id int, amount float32) error {
-	sqlstmt := `call balance_withdraw($1, $2)`
+	sqlstmt := "call balance_withdraw($1, $2)"
 	_, err := s.Exec(sqlstmt, id, amount)
-	return err
+	if err != nil {
+		if strings.Contains(err.Error(), "positive_balance") {
+			return serviceerrors.New("since transaction would result in a negative balance it was aborted", 200)
+		}
+		if strings.Contains(err.Error(), "user was not found") {
+			return serviceerrors.New("user was not found", 200)
+		}
+
+		return serviceerrors.New(err.Error(), 503)
+	}
+
+	return nil
 }
 
 func (s *Storage) TransferMoney(senderID int, receiverID int, amount float32) error {
 	sqlstmt := `call balance_transfer($1, $2, $3)`
 	_, err := s.Exec(sqlstmt, senderID, receiverID, amount)
-	return err
+	if err != nil {
+		if strings.Contains(err.Error(), "positive_balance") {
+			return serviceerrors.New("since transaction would result in a negative balance it was aborted", 200)
+		}
+		if strings.Contains(err.Error(), "user was not found") {
+			return serviceerrors.New("user was not found", 200)
+		}
+
+		return serviceerrors.New(err.Error(), 503)
+	}
+
+	return nil
 }
 
 func (s *Storage) GetBalance(id int) (float32, error) {
@@ -29,6 +58,10 @@ func (s *Storage) GetBalance(id int) (float32, error) {
 	sqlstmt := `SELECT balance_get($1)`
 	row := s.QueryRow(sqlstmt, id)
 	err := row.Scan(&balance)
+	if balance < 0 {
+		return 0.0, serviceerrors.New("user was not found", 200)
+	}
+
 	return balance, err
 }
 
@@ -107,7 +140,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil && t.Rh == nil {
-		return t, errors.New("user was not found")
+		return t, serviceerrors.New("user was not found", 200)
 	}
 
 	return t, nil
@@ -192,7 +225,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil {
-		return t, errors.New("user was not found or invalid page number")
+		return t, serviceerrors.New("user was not found", 200)
 	}
 
 	return t, nil

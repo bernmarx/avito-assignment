@@ -30,7 +30,7 @@ BEGIN
     UPDATE account_balance
         SET balance = balance - withdraw::numeric::money
         WHERE id = _id;
-    IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
+    IF NOT FOUND THEN RAISE EXCEPTION 'user was not found';
     END IF;
 
     INSERT INTO withdraw_journal (account_id, amount, withdraw_time)
@@ -46,13 +46,13 @@ BEGIN
     UPDATE account_balance
         SET balance = balance - amount::numeric::money
         WHERE id = sender;
-    IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
+    IF NOT FOUND THEN RAISE EXCEPTION 'user was not found';
     END IF;
 
     UPDATE account_balance
         SET balance = balance + amount::numeric::money
         WHERE id = receiver;
-    IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
+    IF NOT FOUND THEN RAISE EXCEPTION 'user was not found';
     END IF;
 
     INSERT INTO transfer_journal (sender_id, receiver_id, amount, transfer_time)
@@ -67,7 +67,7 @@ DECLARE
     bal MONEY;
 BEGIN
     SELECT balance INTO bal FROM account_balance WHERE id = _id;
-    IF NOT FOUND THEN RAISE EXCEPTION 'User not found';
+    IF NOT FOUND THEN RETURN -1.0;
     END IF;
     RETURN bal::numeric::float8;
 END; $bal$ LANGUAGE plpgsql;
