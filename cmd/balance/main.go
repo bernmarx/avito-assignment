@@ -42,6 +42,7 @@ func main() {
 		//If connection still fails, stop service
 		db, err = connectToDB()
 		if err != nil {
+			sentry.CaptureException(err)
 			log.Fatalln(err)
 		}
 	}

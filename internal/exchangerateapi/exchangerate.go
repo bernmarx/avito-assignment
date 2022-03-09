@@ -4,6 +4,8 @@ package exchangerateapi
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/bernmarx/avito-assignment/internal/serviceerrors"
 )
 
 type HttpClient interface {
@@ -28,7 +30,7 @@ func (e *ExchangeRate) GetExchangeRate(cur string) (float32, error) {
 	url := e.url[:e.curPos] + cur + e.url[e.curPos:]
 	resp, err := e.Get(url)
 	if err != nil {
-		return 0.0, err
+		return 0.0, serviceerrors.New(err.Error(), 500)
 	}
 	defer resp.Body.Close()
 
@@ -36,5 +38,9 @@ func (e *ExchangeRate) GetExchangeRate(cur string) (float32, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&r)
 
-	return r.Value, err
+	if err != nil {
+		return 0.0, serviceerrors.New(err.Error(), 500)
+	}
+
+	return r.Value, nil
 }

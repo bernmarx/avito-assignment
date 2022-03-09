@@ -53,6 +53,22 @@ func TestWithdraw(t *testing.T) {
 	err = s.WithdrawMoney(3, 1.0)
 
 	assert.NotNil(t, err)
+
+	mock.ExpectExec("call balance_withdraw*").
+		WithArgs(int(3), float32(1.0)).
+		WillReturnError(errors.New("positive_balance"))
+
+	err = s.WithdrawMoney(3, 1.0)
+
+	assert.NotNil(t, err)
+
+	mock.ExpectExec("call balance_withdraw*").
+		WithArgs(int(3), float32(1.0)).
+		WillReturnError(errors.New("user was not found"))
+
+	err = s.WithdrawMoney(3, 1.0)
+
+	assert.NotNil(t, err)
 }
 
 func TestTransfer(t *testing.T) {
