@@ -101,5 +101,3 @@ CREATE TABLE IF NOT EXISTS transfer_journal (
     amount MONEY NOT NULL CONSTRAINT positive_transfer CHECK(amount::money::numeric::float8 > 0),
     transfer_time TIMESTAMP WITH TIME ZONE
 );
-
-CREATE ROLE handler WITH LOGIN SUPERUSER PASSWORD 'pass';

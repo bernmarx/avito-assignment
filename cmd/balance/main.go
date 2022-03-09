@@ -17,10 +17,6 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/http/api"
 )
 
-const (
-	port = ":8080"
-)
-
 func connectToDB() (*sql.DB, error) {
 	connData := "host=" + os.Getenv("DB_HOST") + " " + "port=" + os.Getenv("DB_PORT")
 	connData = connData + " " + "user=" + os.Getenv("DB_USER") + " " + "password=" + os.Getenv("DB_PASSWORD")
@@ -53,7 +49,7 @@ func main() {
 	err = sentry.Init(sentry.ClientOptions{
 		Dsn:         os.Getenv("SENTRY_DSN"),
 		Environment: "",
-		Release:     "my-project-name@1.0.0",
+		Release:     os.Getenv("SENTRY_RELEASE"),
 		Debug:       true,
 	})
 
@@ -82,10 +78,10 @@ func main() {
 
 	http.Handle("/", r)
 
-	err = http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(":"+os.Getenv("SERVICE_PORT"), nil)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	log.Println("Server was started at " + port + " and is listening")
+	log.Println("Server was started at " + os.Getenv("SERVICE_PORT") + " and is listening")
 }

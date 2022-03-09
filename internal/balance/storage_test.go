@@ -29,6 +29,8 @@ func TestDeposit(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+//Rewrite tests they do not match methods' logic
+
 func TestWithdraw(t *testing.T) {
 	db, mock, err := sqlmock.New()
 
