@@ -82,15 +82,9 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for deposits.Next() {
-		var time string
-		var amount float32
-		err := deposits.Scan(&time, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Dh = append(t.Dh, DepositHistory{Time: time, Amount: amount})
+	t.Dh, err = getDepositHistory(deposits)
+	if err != nil {
+		return t, err
 	}
 
 	withdrawals, err := s.Query(getWithdrawal, id)
@@ -98,15 +92,9 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for withdrawals.Next() {
-		var time string
-		var amount float32
-		err := withdrawals.Scan(&time, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Wh = append(t.Wh, WithdrawalHistory{Time: time, Amount: amount})
+	t.Wh, err = getWithdrawalHistory(withdrawals)
+	if err != nil {
+		return t, err
 	}
 
 	sends, err := s.Query(getSend, id)
@@ -114,16 +102,9 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for sends.Next() {
-		var receiver int
-		var time string
-		var amount float32
-		err := sends.Scan(&time, &receiver, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Sh = append(t.Sh, SendHistory{ReceiverID: receiver, Time: time, Amount: amount})
+	t.Sh, err = getSendsHistory(sends)
+	if err != nil {
+		return t, err
 	}
 
 	receives, err := s.Query(getReceive, id)
@@ -131,16 +112,9 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for receives.Next() {
-		var sender int
-		var time string
-		var amount float32
-		err := receives.Scan(&time, &sender, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Rh = append(t.Rh, ReceiveHistory{SenderID: sender, Time: time, Amount: amount})
+	t.Rh, err = getReceivesHistory(receives)
+	if err != nil {
+		return t, err
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil && t.Rh == nil {
@@ -152,7 +126,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 
 func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (TransactionHistory, error) {
 	var t TransactionHistory
-	stmts := GetSqlStmtsPage(sort)
+	stmts := getSqlStmtsPage(sort)
 
 	pageLength64, err := strconv.ParseInt(os.Getenv("MAX_HISTORY_PAGE_LEN"), 10, 0)
 	if err != nil {
@@ -167,15 +141,9 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for deposits.Next() {
-		var time string
-		var amount float32
-		err := deposits.Scan(&time, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Dh = append(t.Dh, DepositHistory{Time: time, Amount: amount})
+	t.Dh, err = getDepositHistory(deposits)
+	if err != nil {
+		return t, err
 	}
 
 	withdrawals, err := s.Query(stmts[1], id, pageLength, offset)
@@ -183,15 +151,9 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for withdrawals.Next() {
-		var time string
-		var amount float32
-		err := withdrawals.Scan(&time, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Wh = append(t.Wh, WithdrawalHistory{Time: time, Amount: amount})
+	t.Wh, err = getWithdrawalHistory(withdrawals)
+	if err != nil {
+		return t, err
 	}
 
 	sends, err := s.Query(stmts[2], id, pageLength, offset)
@@ -199,16 +161,9 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for sends.Next() {
-		var receiver int
-		var time string
-		var amount float32
-		err := sends.Scan(&time, &receiver, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Sh = append(t.Sh, SendHistory{ReceiverID: receiver, Time: time, Amount: amount})
+	t.Sh, err = getSendsHistory(sends)
+	if err != nil {
+		return t, err
 	}
 
 	receives, err := s.Query(stmts[3], id, pageLength, offset)
@@ -216,20 +171,13 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 		return t, serviceerrors.New(err.Error(), 500)
 	}
 
-	for receives.Next() {
-		var sender int
-		var time string
-		var amount float32
-		err := receives.Scan(&time, &sender, &amount)
-		if err != nil {
-			return t, serviceerrors.New(err.Error(), 500)
-		}
-
-		t.Rh = append(t.Rh, ReceiveHistory{SenderID: sender, Time: time, Amount: amount})
+	t.Rh, err = getReceivesHistory(receives)
+	if err != nil {
+		return t, err
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil {
-		return t, serviceerrors.New("user was not found", 200)
+		return t, serviceerrors.New("user was not found or there is no data on this page", 200)
 	}
 
 	return t, nil
