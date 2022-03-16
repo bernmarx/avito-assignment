@@ -12,9 +12,14 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
-	"github.com/bernmarx/avito-assignment/internal/balance"
-	"github.com/bernmarx/avito-assignment/internal/exchangerateapi"
-	"github.com/bernmarx/avito-assignment/internal/http/api"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/deposit_post"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_balance_get"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_history_get"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_history_page_get"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/transfer_post"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/withdraw_post"
+	"github.com/bernmarx/avito-assignment/internal/domain/balance"
+	"github.com/bernmarx/avito-assignment/internal/infrastructure/exchangerateclient"
 )
 
 func connectToDB() (*sql.DB, error) {
@@ -64,18 +69,16 @@ func main() {
 
 	eRcurPos, _ := strconv.ParseInt(os.Getenv("EXCHANGE_RATE_API_CUR_POS"), 10, 0)
 
-	eR := exchangerateapi.NewExchangeRate(http.DefaultClient, eRurl, int(eRcurPos))
-
-	service := api.NewService()
+	eR := exchangerateclient.NewExchangeRate(http.DefaultClient, eRurl, int(eRcurPos))
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/deposit", service.GetDepositHandler(s, eR)).Methods("POST")
-	r.HandleFunc("/withdraw", service.GetWithdrawHandler(s, eR)).Methods("POST")
-	r.HandleFunc("/transfer", service.GetTransferHandler(s, eR)).Methods("POST")
-	r.HandleFunc("/balance", service.GetBalanceHandler(s, eR)).Methods("GET")
-	r.HandleFunc("/history", service.GetTransactionHistoryHandler(s, eR)).Methods("GET")
-	r.HandleFunc("/history/{page}", service.GetTransactionHistoryPageHandler(s, eR)).Methods("GET")
+	r.HandleFunc("/deposit", deposit_post.Handler(s, eR)).Methods("POST")
+	r.HandleFunc("/withdraw", withdraw_post.Handler(s, eR)).Methods("POST")
+	r.HandleFunc("/transfer", transfer_post.Handler(s, eR)).Methods("POST")
+	r.HandleFunc("/balance", get_balance_get.Handler(s, eR)).Methods("GET")
+	r.HandleFunc("/history", get_history_get.Handler(s, eR)).Methods("GET")
+	r.HandleFunc("/history/{page}", get_history_page_get.Handler(s, eR)).Methods("GET")
 
 	http.Handle("/", r)
 

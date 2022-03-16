@@ -1,5 +1,14 @@
 package balance
 
+type Balance struct {
+	Storage         StorageAccess
+	ExchangeRateApi ExchangeRateGetter
+}
+
+func NewBalance(s StorageAccess, eR ExchangeRateGetter) *Balance {
+	return &Balance{s, eR}
+}
+
 func (b *Balance) MakeDeposit(id int, amount float32) error {
 	err := checkID(id)
 	if err != nil {

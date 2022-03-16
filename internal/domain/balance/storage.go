@@ -1,19 +1,26 @@
 package balance
 
 import (
-	"errors"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/bernmarx/avito-assignment/internal/serviceerrors"
+	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
+
+type Storage struct {
+	database
+}
+
+func NewStorage(db database) *Storage {
+	return &Storage{database: db}
+}
 
 func (s *Storage) DepositMoney(id int, amount float32) error {
 	sqlstmt := `call balance_deposit($1, $2)`
 	_, err := s.Exec(sqlstmt, id, amount)
 	if err != nil {
-		return serviceerrors.New(err.Error(), 503)
+		return errors.New(err.Error(), 503)
 	}
 
 	return nil
@@ -24,13 +31,13 @@ func (s *Storage) WithdrawMoney(id int, amount float32) error {
 	_, err := s.Exec(sqlstmt, id, amount)
 	if err != nil {
 		if strings.Contains(err.Error(), "positive_balance") {
-			return serviceerrors.New("since transaction would result in a negative balance it was aborted", 200)
+			return errors.New("since transaction would result in a negative balance it was aborted", 200)
 		}
 		if strings.Contains(err.Error(), "user was not found") {
-			return serviceerrors.New("user was not found", 200)
+			return errors.New("user was not found", 200)
 		}
 
-		return serviceerrors.New(err.Error(), 503)
+		return errors.New(err.Error(), 503)
 	}
 
 	return nil
@@ -41,13 +48,13 @@ func (s *Storage) TransferMoney(senderID int, receiverID int, amount float32) er
 	_, err := s.Exec(sqlstmt, senderID, receiverID, amount)
 	if err != nil {
 		if strings.Contains(err.Error(), "positive_balance") {
-			return serviceerrors.New("since transaction would result in a negative balance it was aborted", 200)
+			return errors.New("since transaction would result in a negative balance it was aborted", 200)
 		}
 		if strings.Contains(err.Error(), "user was not found") {
-			return serviceerrors.New("user was not found", 200)
+			return errors.New("user was not found", 200)
 		}
 
-		return serviceerrors.New(err.Error(), 503)
+		return errors.New(err.Error(), 503)
 	}
 
 	return nil
@@ -59,11 +66,11 @@ func (s *Storage) GetBalance(id int) (float32, error) {
 	row := s.QueryRow(sqlstmt, id)
 	err := row.Scan(&balance)
 	if balance < 0 {
-		return 0.0, serviceerrors.New("user was not found", 200)
+		return 0.0, errors.New("user was not found", 200)
 	}
 
 	if err != nil {
-		return 0.0, serviceerrors.New(err.Error(), 500)
+		return 0.0, errors.New(err.Error(), 500)
 	}
 
 	return balance, nil
@@ -79,7 +86,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 
 	deposits, err := s.Query(getDeposit, id)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Dh, err = getDepositHistory(deposits)
@@ -89,7 +96,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 
 	withdrawals, err := s.Query(getWithdrawal, id)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Wh, err = getWithdrawalHistory(withdrawals)
@@ -99,7 +106,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 
 	sends, err := s.Query(getSend, id)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Sh, err = getSendsHistory(sends)
@@ -109,7 +116,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 
 	receives, err := s.Query(getReceive, id)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Rh, err = getReceivesHistory(receives)
@@ -118,7 +125,7 @@ func (s *Storage) GetTransactionHistory(id int) (TransactionHistory, error) {
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil && t.Rh == nil {
-		return t, serviceerrors.New("user was not found", 200)
+		return t, errors.New("user was not found", 200)
 	}
 
 	return t, nil
@@ -130,7 +137,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 
 	pageLength64, err := strconv.ParseInt(os.Getenv("MAX_HISTORY_PAGE_LEN"), 10, 0)
 	if err != nil {
-		return t, errors.New("could not get MAX_HISTORY_PAGE_LEN")
+		return t, errors.New("could not get MAX_HISTORY_PAGE_LEN", 500)
 	}
 
 	pageLength := int(pageLength64)
@@ -138,7 +145,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 
 	deposits, err := s.Query(stmts[0], id, pageLength, offset)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Dh, err = getDepositHistory(deposits)
@@ -148,7 +155,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 
 	withdrawals, err := s.Query(stmts[1], id, pageLength, offset)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Wh, err = getWithdrawalHistory(withdrawals)
@@ -158,7 +165,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 
 	sends, err := s.Query(stmts[2], id, pageLength, offset)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Sh, err = getSendsHistory(sends)
@@ -168,7 +175,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 
 	receives, err := s.Query(stmts[3], id, pageLength, offset)
 	if err != nil {
-		return t, serviceerrors.New(err.Error(), 500)
+		return t, errors.New(err.Error(), 500)
 	}
 
 	t.Rh, err = getReceivesHistory(receives)
@@ -177,7 +184,7 @@ func (s *Storage) GetTransactionHistoryPage(id int, sort string, page int) (Tran
 	}
 
 	if t.Dh == nil && t.Sh == nil && t.Wh == nil {
-		return t, serviceerrors.New("user was not found or there is no data on this page", 200)
+		return t, errors.New("user was not found or there is no data on this page", 200)
 	}
 
 	return t, nil

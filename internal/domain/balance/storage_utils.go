@@ -3,7 +3,7 @@ package balance
 import (
 	"database/sql"
 
-	"github.com/bernmarx/avito-assignment/internal/serviceerrors"
+	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
 func getSqlStmtsPage(sort string) []string {
@@ -59,7 +59,7 @@ func getDepositHistory(d *sql.Rows) ([]DepositHistory, error) {
 		var amount float32
 		err := d.Scan(&time, &amount)
 		if err != nil {
-			return dh, serviceerrors.New(err.Error(), 500)
+			return dh, errors.New(err.Error(), 500)
 		}
 
 		dh = append(dh, DepositHistory{Time: time, Amount: amount})
@@ -76,7 +76,7 @@ func getWithdrawalHistory(w *sql.Rows) ([]WithdrawalHistory, error) {
 		var amount float32
 		err := w.Scan(&time, &amount)
 		if err != nil {
-			return wh, serviceerrors.New(err.Error(), 500)
+			return wh, errors.New(err.Error(), 500)
 		}
 
 		wh = append(wh, WithdrawalHistory{Time: time, Amount: amount})
@@ -95,7 +95,7 @@ func getSendsHistory(s *sql.Rows) ([]SendHistory, error) {
 
 		err := s.Scan(&time, &receiver, &amount)
 		if err != nil {
-			return sh, serviceerrors.New(err.Error(), 500)
+			return sh, errors.New(err.Error(), 500)
 		}
 
 		sh = append(sh, SendHistory{ReceiverID: receiver, Time: time, Amount: amount})
@@ -114,7 +114,7 @@ func getReceivesHistory(r *sql.Rows) ([]ReceiveHistory, error) {
 
 		err := r.Scan(&time, &sender, &amount)
 		if err != nil {
-			return rh, serviceerrors.New(err.Error(), 500)
+			return rh, errors.New(err.Error(), 500)
 		}
 
 		rh = append(rh, ReceiveHistory{SenderID: sender, Time: time, Amount: amount})

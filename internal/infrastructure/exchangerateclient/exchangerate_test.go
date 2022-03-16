@@ -1,4 +1,4 @@
-package exchangerateapi
+package exchangerateclient
 
 import (
 	"fmt"

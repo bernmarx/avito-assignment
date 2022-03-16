@@ -1,4 +1,4 @@
-package serviceerrors
+package errors
 
 type Error struct {
 	Msg  string

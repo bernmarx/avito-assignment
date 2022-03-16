@@ -12,14 +12,6 @@ type database interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
-type Storage struct {
-	database
-}
-
-func NewStorage(db database) *Storage {
-	return &Storage{database: db}
-}
-
 type TransactionHistory struct {
 	Dh []DepositHistory    `json:"deposit_history"`
 	Wh []WithdrawalHistory `json:"withdrawal_history"`
