@@ -53,10 +53,8 @@ func main() {
 	}
 
 	err = sentry.Init(sentry.ClientOptions{
-		Dsn:         os.Getenv("SENTRY_DSN"),
-		Environment: "",
-		Release:     os.Getenv("SENTRY_RELEASE"),
-		Debug:       true,
+		Dsn:     os.Getenv("SENTRY_DSN"),
+		Release: os.Getenv("SENTRY_RELEASE"),
 	})
 
 	if err != nil {

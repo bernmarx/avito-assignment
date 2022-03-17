@@ -2,13 +2,12 @@ package withdraw_post
 
 import (
 	"encoding/json"
-	standardErrors "errors"
-	"log"
 	"net/http"
 
 	"github.com/bernmarx/avito-assignment/internal/app/http/api"
 	"github.com/bernmarx/avito-assignment/internal/domain/balance"
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
+	"github.com/bernmarx/avito-assignment/internal/infrastructure/log"
 )
 
 func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
@@ -22,16 +21,10 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		err := b.MakeWithdraw(data.ID, data.Amount)
 		if err != nil {
-			var sErr *errors.Error
+			err := err.(*errors.Error)
 
-			if standardErrors.As(err, &sErr) {
-				log.Println(sErr.Msg)
-				http.Error(w, sErr.Msg, sErr.Code)
-				return
-			}
-
-			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Logger().WithError(err).Error(err.Error())
+			http.Error(w, err.Msg, err.Code)
 			return
 		}
 

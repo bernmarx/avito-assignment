@@ -8,5 +8,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/lib/pq v1.10.4
+	github.com/orandin/sentrus v0.0.0-20220102214014-90c57edb68fb
+	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 )
