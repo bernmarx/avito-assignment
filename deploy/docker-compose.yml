@@ -15,10 +15,10 @@ services:
     ports:
       - 5430:5432
 
-  avito-service:
+  microservice:
     build:
       context: ./../
-      dockerfile: ./build/docker/balance/Dockerfile
+      dockerfile: ./build/docker/microservice/Dockerfile
     restart: always
     env_file:
       - ./.env
