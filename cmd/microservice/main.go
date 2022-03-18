@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,6 +19,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/app/http/api/withdraw_post"
 	"github.com/bernmarx/avito-assignment/internal/domain/balance"
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/exchangerateclient"
+	"github.com/bernmarx/avito-assignment/internal/infrastructure/log"
 )
 
 func connectToDB() (*sql.DB, error) {
@@ -48,7 +48,7 @@ func main() {
 		db, err = connectToDB()
 		if err != nil {
 			sentry.CaptureException(err)
-			log.Fatalln(err)
+			log.Logger().WithError(err).Fatal(err.Error())
 		}
 	}
 
@@ -58,7 +58,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("sentry.Init: %s", err)
+		log.Logger().WithError(err).Fatal(err.Error())
 	}
 
 	s := balance.NewStorage(db)
@@ -80,10 +80,10 @@ func main() {
 
 	http.Handle("/", r)
 
+	log.Logger().Info("Starting server on " + os.Getenv("SERVICE_PORT"))
+
 	err = http.ListenAndServe(":"+os.Getenv("SERVICE_PORT"), nil)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Logger().WithError(err).Fatal(err.Error())
 	}
-
-	log.Println("Server was started at " + os.Getenv("SERVICE_PORT") + " and is listening")
 }
