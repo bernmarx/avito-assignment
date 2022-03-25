@@ -1,6 +1,9 @@
 # github.com/DATA-DOG/go-sqlmock v1.5.0
 ## explicit
 github.com/DATA-DOG/go-sqlmock
+# github.com/Masterminds/squirrel v1.5.2
+## explicit
+github.com/Masterminds/squirrel
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/getsentry/sentry-go v0.12.0
@@ -15,6 +18,10 @@ github.com/golang/mock/gomock
 # github.com/gorilla/mux v1.8.0
 ## explicit
 github.com/gorilla/mux
+# github.com/lann/builder v0.0.0-20180802200727-47ae307949d0
+github.com/lann/builder
+# github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
+github.com/lann/ps
 # github.com/lib/pq v1.10.4
 ## explicit
 github.com/lib/pq

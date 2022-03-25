@@ -14,12 +14,15 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
-		var data api.Transaction
-		json.NewDecoder(r.Body).Decode(&data)
+		var rd api.TransferRequestData
+
+		json.NewDecoder(r.Body).Decode(&rd)
 
 		b := balance.NewBalance(strg, eR)
 
-		err := b.MakeTransfer(data.ID, data.Receiver, data.Amount)
+		err := b.MakeTransfer(rd.Sender_account_id, rd.Sender_balance_id,
+			rd.Receiver_account_id, rd.Receiver_balance_id, rd.Amount)
+
 		if err != nil {
 			err := err.(*errors.Error)
 

@@ -1,4 +1,4 @@
-package get_history_get
+package get_balance_history_get
 
 import (
 	"encoding/json"
@@ -14,12 +14,14 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
-		var data api.RequestData
-		json.NewDecoder(r.Body).Decode(&data)
+		var rd api.GetBalanceHistoryRequestData
+
+		json.NewDecoder(r.Body).Decode(&rd)
 
 		b := balance.NewBalance(strg, eR)
 
-		j, err := b.GetTransactionHistory(data.ID)
+		j, err := b.GetBalanceHistory(rd.Account_id, rd.Balance_id, rd.Sort, 0)
+
 		if err != nil {
 			err := err.(*errors.Error)
 

@@ -1,4 +1,4 @@
-package get_history_page_get
+package get_balance_history_page_get
 
 import (
 	"encoding/json"
@@ -18,27 +18,27 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
-		var rd api.RequestData
+		var rd api.GetBalanceHistoryRequestData
+
 		json.NewDecoder(r.Body).Decode(&rd)
 
 		if rd.Sort == "" {
-			rd.Sort = os.Getenv("DEFAULT_SORT")
+			rd.Sort = os.Getenv("GET_BALANCE_HISTORY_DEFAULT_SORT")
 		}
 
 		variables := mux.Vars(r)
 
-		page64, err := strconv.ParseInt(variables["page"], 10, 0)
+		page64, err := strconv.ParseInt(variables["page"], 0, 0)
 		if err != nil {
 			log.Logger().WithError(err).Error(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		page := int(page64)
-
 		b := balance.NewBalance(strg, eR)
 
-		j, err := b.GetTransactionHistoryPage(rd.ID, rd.Sort, page)
+		j, err := b.GetBalanceHistory(rd.Account_id, rd.Balance_id, rd.Sort, page64)
+
 		if err != nil {
 			err := err.(*errors.Error)
 

@@ -14,14 +14,13 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
-		var rd api.RequestData
-		var acc api.Account
+		var rd api.GetBalanceRequestData
+
 		json.NewDecoder(r.Body).Decode(&rd)
 
 		b := balance.NewBalance(strg, eR)
 
-		var err error
-		acc.Balance, err = b.GetBalance(rd.ID)
+		balance, err := b.GetBalance(rd.Account_id, rd.Balance_id)
 		if err != nil {
 			err := err.(*errors.Error)
 
@@ -33,13 +32,6 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 		query := r.URL.Query()
 		currency, exists := query["currency"]
 
-		//Returns error if there is more than 1 currency value
-		if exists && (len(currency) != 1) {
-			log.Logger().Info("invalid conversion query")
-			http.Error(w, "Invalid conversion query", http.StatusBadRequest)
-			return
-		}
-
 		if exists {
 			rate, err := eR.GetExchangeRate(currency[0])
 			if err != nil {
@@ -48,18 +40,25 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 				return
 			}
 
-			acc.Balance *= rate
+			balance *= rate
 		}
 
-		acc.ID = rd.ID
+		response := api.Balance{
+			Account_id: rd.Account_id,
+			Balance_id: rd.Balance_id,
+			Balance:    balance,
+		}
 
 		w.WriteHeader(http.StatusOK)
-		j, err := acc.GetJSON()
+
+		j, err := json.Marshal(response)
+
 		if err != nil {
 			log.Logger().WithError(err).Error(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.Write(j)
 	}
 }

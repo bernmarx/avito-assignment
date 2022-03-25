@@ -1,5 +1,7 @@
 package balance
 
+import "encoding/json"
+
 type Balance struct {
 	Storage         StorageAccess
 	ExchangeRateApi ExchangeRateGetter
@@ -9,89 +11,36 @@ func NewBalance(s StorageAccess, eR ExchangeRateGetter) *Balance {
 	return &Balance{s, eR}
 }
 
-func (b *Balance) MakeDeposit(id int, amount float32) error {
-	err := checkID(id)
-	if err != nil {
-		return err
-	}
-	err = checkAmount(amount)
-	if err != nil {
-		return err
-	}
-
-	err = b.Storage.DepositMoney(id, amount)
+func (b *Balance) MakeDeposit(account_id int, balance_id int, amount float32) error {
+	err := b.Storage.DepositMoney(account_id, balance_id, amount)
 
 	return err
 }
-func (b *Balance) MakeWithdraw(id int, amount float32) error {
-	err := checkID(id)
-	if err != nil {
-		return err
-	}
-	err = checkAmount(amount)
-	if err != nil {
-		return err
-	}
-
-	err = b.Storage.WithdrawMoney(id, amount)
+func (b *Balance) MakeWithdraw(account_id int, balance_id int, amount float32) error {
+	err := b.Storage.WithdrawMoney(account_id, balance_id, amount)
 
 	return err
 }
-func (b *Balance) MakeTransfer(id int, receiverId int, amount float32) error {
-	err := checkID(id)
-	if err != nil {
-		return err
-	}
-	err = checkID(receiverId)
-	if err != nil {
-		return err
-	}
-	err = checkAmount(amount)
-	if err != nil {
-		return err
-	}
+func (b *Balance) MakeTransfer(sender_account_id int, sender_balance_id int,
+	receiver_account_id int, receiver_balance_id int, amount float32) error {
 
-	err = b.Storage.TransferMoney(id, receiverId, amount)
+	err := b.Storage.TransferMoney(sender_account_id, sender_balance_id, receiver_account_id,
+		receiver_balance_id, amount)
 
 	return err
 }
-func (b *Balance) GetBalance(id int) (float32, error) {
-	err := checkID(id)
-	if err != nil {
-		return 0.0, err
-	}
-	bal, err := b.Storage.GetBalance(id)
+func (b *Balance) GetBalance(account_id int, balance_id int) (float32, error) {
+	bal, err := b.Storage.GetBalance(account_id, balance_id)
 	return bal, err
 }
 
-func (b *Balance) GetTransactionHistory(id int) ([]byte, error) {
-	err := checkID(id)
+func (b *Balance) GetBalanceHistory(account_id int, balance_id int, sort string, page int64) ([]byte, error) {
+	h, err := b.Storage.GetBalanceHistory(account_id, balance_id, sort, page)
 	if err != nil {
 		return make([]byte, 0), err
 	}
 
-	t, err := b.Storage.GetTransactionHistory(id)
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	j, err := t.GetJSON()
-
-	return j, err
-}
-
-func (b *Balance) GetTransactionHistoryPage(id int, sort string, page int) ([]byte, error) {
-	err := checkID(id)
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	t, err := b.Storage.GetTransactionHistoryPage(id, sort, page)
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	j, err := t.GetJSON()
+	j, err := json.Marshal(h)
 
 	return j, err
 }

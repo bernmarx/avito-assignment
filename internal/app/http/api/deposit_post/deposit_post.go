@@ -14,12 +14,13 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
-		var data api.Transaction
-		json.NewDecoder(r.Body).Decode(&data)
+		var rd api.DepositWithdrawRequestData
+
+		json.NewDecoder(r.Body).Decode(&rd)
 
 		b := balance.NewBalance(strg, eR)
 
-		err := b.MakeDeposit(data.ID, data.Amount)
+		err := b.MakeDeposit(rd.Account_id, rd.Balance_id, rd.Amount)
 		if err != nil {
 			err := err.(*errors.Error)
 

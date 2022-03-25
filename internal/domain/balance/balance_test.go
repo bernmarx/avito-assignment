@@ -1,130 +1,122 @@
 package balance
 
-import (
-	"errors"
-	"testing"
+// func TestMakeDeposit(t *testing.T) {
+// 	ctrl := gomock.NewController(t)
 
-	gomock "github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-)
+// 	m := NewMockStorageAccess(ctrl)
 
-func TestMakeDeposit(t *testing.T) {
-	ctrl := gomock.NewController(t)
+// 	meR := NewMockExchangeRateGetter(ctrl)
 
-	m := NewMockStorageAccess(ctrl)
+// 	m.EXPECT().DepositMoney(int(123), float32(10.0)).Return(nil)
 
-	meR := NewMockExchangeRateGetter(ctrl)
+// 	b := Balance{m, meR}
+// 	err := b.MakeDeposit(123, 10.0)
 
-	m.EXPECT().DepositMoney(int(123), float32(10.0)).Return(nil)
+// 	assert.Nil(t, err)
 
-	b := Balance{m, meR}
-	err := b.MakeDeposit(123, 10.0)
+// 	m.EXPECT().DepositMoney(int(100), float32(1.0)).Return(errors.New("some error"))
 
-	assert.Nil(t, err)
+// 	err = b.MakeDeposit(100, 1.0)
 
-	m.EXPECT().DepositMoney(int(100), float32(1.0)).Return(errors.New("some error"))
+// 	assert.NotNil(t, err)
 
-	err = b.MakeDeposit(100, 1.0)
+// 	err = b.MakeDeposit(0, 3.0)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
 
-	err = b.MakeDeposit(0, 3.0)
+// 	err = b.MakeDeposit(11, 0.0)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
+// }
 
-	err = b.MakeDeposit(11, 0.0)
+// func TestMakeWithdraw(t *testing.T) {
 
-	assert.NotNil(t, err)
-}
+// 	ctrl := gomock.NewController(t)
 
-func TestMakeWithdraw(t *testing.T) {
+// 	m := NewMockStorageAccess(ctrl)
 
-	ctrl := gomock.NewController(t)
+// 	meR := NewMockExchangeRateGetter(ctrl)
 
-	m := NewMockStorageAccess(ctrl)
+// 	m.EXPECT().WithdrawMoney(int(123), float32(10.0)).Return(nil)
 
-	meR := NewMockExchangeRateGetter(ctrl)
+// 	b := Balance{m, meR}
+// 	err := b.MakeWithdraw(123, 10.0)
 
-	m.EXPECT().WithdrawMoney(int(123), float32(10.0)).Return(nil)
+// 	assert.Nil(t, err)
 
-	b := Balance{m, meR}
-	err := b.MakeWithdraw(123, 10.0)
+// 	m.EXPECT().WithdrawMoney(int(100), float32(1.0)).Return(errors.New("some error"))
 
-	assert.Nil(t, err)
+// 	err = b.MakeWithdraw(100, 1.0)
 
-	m.EXPECT().WithdrawMoney(int(100), float32(1.0)).Return(errors.New("some error"))
+// 	assert.NotNil(t, err)
 
-	err = b.MakeWithdraw(100, 1.0)
+// 	err = b.MakeWithdraw(0, 3.0)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
 
-	err = b.MakeWithdraw(0, 3.0)
+// 	err = b.MakeWithdraw(11, 0.0)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
+// }
 
-	err = b.MakeWithdraw(11, 0.0)
+// func TestMakeTransfer(t *testing.T) {
+// 	ctrl := gomock.NewController(t)
 
-	assert.NotNil(t, err)
-}
+// 	m := NewMockStorageAccess(ctrl)
 
-func TestMakeTransfer(t *testing.T) {
-	ctrl := gomock.NewController(t)
+// 	meR := NewMockExchangeRateGetter(ctrl)
 
-	m := NewMockStorageAccess(ctrl)
+// 	m.EXPECT().TransferMoney(int(12), int(34), float32(100.0)).Return(nil)
 
-	meR := NewMockExchangeRateGetter(ctrl)
+// 	b := Balance{m, meR}
+// 	err := b.MakeTransfer(12, 34, 100.0)
 
-	m.EXPECT().TransferMoney(int(12), int(34), float32(100.0)).Return(nil)
+// 	assert.Nil(t, err)
 
-	b := Balance{m, meR}
-	err := b.MakeTransfer(12, 34, 100.0)
+// 	m.EXPECT().TransferMoney(int(56), int(78), float32(1.0)).Return(errors.New("some error"))
 
-	assert.Nil(t, err)
+// 	err = b.MakeTransfer(56, 78, 1.0)
 
-	m.EXPECT().TransferMoney(int(56), int(78), float32(1.0)).Return(errors.New("some error"))
+// 	assert.NotNil(t, err)
 
-	err = b.MakeTransfer(56, 78, 1.0)
+// 	err = b.MakeTransfer(0, 10, 24.5)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
 
-	err = b.MakeTransfer(0, 10, 24.5)
+// 	err = b.MakeTransfer(10, 0, 24.5)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
 
-	err = b.MakeTransfer(10, 0, 24.5)
+// 	err = b.MakeTransfer(10, 20, 0)
 
-	assert.NotNil(t, err)
+// 	assert.NotNil(t, err)
+// }
 
-	err = b.MakeTransfer(10, 20, 0)
+// func TestGetBalance(t *testing.T) {
+// 	ctrl := gomock.NewController(t)
 
-	assert.NotNil(t, err)
-}
+// 	m := NewMockStorageAccess(ctrl)
 
-func TestGetBalance(t *testing.T) {
-	ctrl := gomock.NewController(t)
+// 	meR := NewMockExchangeRateGetter(ctrl)
 
-	m := NewMockStorageAccess(ctrl)
+// 	m.EXPECT().GetBalance(int(10)).Return(float32(24.0), nil)
 
-	meR := NewMockExchangeRateGetter(ctrl)
+// 	b := Balance{m, meR}
 
-	m.EXPECT().GetBalance(int(10)).Return(float32(24.0), nil)
+// 	bal, err := b.GetBalance(10)
 
-	b := Balance{m, meR}
+// 	assert.Equal(t, float32(24.0), bal)
+// 	assert.Nil(t, err)
 
-	bal, err := b.GetBalance(10)
+// 	m.EXPECT().GetBalance(int(30)).Return(float32(0.0), errors.New("some error"))
 
-	assert.Equal(t, float32(24.0), bal)
-	assert.Nil(t, err)
+// 	bal, err = b.GetBalance(30)
 
-	m.EXPECT().GetBalance(int(30)).Return(float32(0.0), errors.New("some error"))
+// 	assert.Equal(t, float32(0.0), bal)
+// 	assert.NotNil(t, err)
 
-	bal, err = b.GetBalance(30)
+// 	bal, err = b.GetBalance(0)
 
-	assert.Equal(t, float32(0.0), bal)
-	assert.NotNil(t, err)
-
-	bal, err = b.GetBalance(0)
-
-	assert.Equal(t, float32(0.0), bal)
-	assert.NotNil(t, err)
-}
+// 	assert.Equal(t, float32(0.0), bal)
+// 	assert.NotNil(t, err)
+// }

@@ -13,8 +13,8 @@ import (
 
 	"github.com/bernmarx/avito-assignment/internal/app/http/api/deposit_post"
 	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_balance_get"
-	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_history_get"
-	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_history_page_get"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_balance_history_get"
+	"github.com/bernmarx/avito-assignment/internal/app/http/api/get_balance_history_page_get"
 	"github.com/bernmarx/avito-assignment/internal/app/http/api/transfer_post"
 	"github.com/bernmarx/avito-assignment/internal/app/http/api/withdraw_post"
 	"github.com/bernmarx/avito-assignment/internal/domain/balance"
@@ -75,8 +75,8 @@ func main() {
 	r.HandleFunc("/withdraw", withdraw_post.Handler(s, eR)).Methods("POST")
 	r.HandleFunc("/transfer", transfer_post.Handler(s, eR)).Methods("POST")
 	r.HandleFunc("/balance", get_balance_get.Handler(s, eR)).Methods("GET")
-	r.HandleFunc("/history", get_history_get.Handler(s, eR)).Methods("GET")
-	r.HandleFunc("/history/{page}", get_history_page_get.Handler(s, eR)).Methods("GET")
+	r.HandleFunc("/history", get_balance_history_get.Handler(s, eR)).Methods("GET")
+	r.HandleFunc("/history/{page}", get_balance_history_page_get.Handler(s, eR)).Methods("GET")
 
 	http.Handle("/", r)
 

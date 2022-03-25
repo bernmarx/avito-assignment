@@ -1,25 +1,32 @@
 package api
 
-import "encoding/json"
-
-type RequestData struct {
-	ID      int     `json:"id"`
-	Balance float32 `json:"balance"`
-	Sort    string  `json:"sort"`
+type DepositWithdrawRequestData struct {
+	Account_id int     `json:"account_id"`
+	Balance_id int     `json:"balance_id"`
+	Amount     float32 `json:"amount"`
 }
 
-type Account struct {
-	ID      int     `json:"id"`
-	Balance float32 `json:"balance"`
+type TransferRequestData struct {
+	Sender_account_id   int     `json:"sender_account_id"`
+	Sender_balance_id   int     `json:"sender_balance_id"`
+	Receiver_account_id int     `json:"receiver_account_id"`
+	Receiver_balance_id int     `json:"receiver_balance_id"`
+	Amount              float32 `json:"amount"`
 }
 
-func (a *Account) GetJSON() ([]byte, error) {
-	j, err := json.Marshal(a)
-	return j, err
+type GetBalanceRequestData struct {
+	Account_id int `json:"account_id"`
+	Balance_id int `json:"balance_id"`
 }
 
-type Transaction struct {
-	ID       int     `json:"id"`
-	Receiver int     `json:"receiver"`
-	Amount   float32 `json:"amount"`
+type GetBalanceHistoryRequestData struct {
+	Account_id int    `json:"account_id"`
+	Balance_id int    `json:"balance_id"`
+	Sort       string `json:"sort"`
+}
+
+type Balance struct {
+	Account_id int     `json:"account_id"`
+	Balance_id int     `json:"balance_id"`
+	Balance    float32 `json:"balance"`
 }
