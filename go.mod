@@ -3,7 +3,6 @@ module github.com/bernmarx/avito-assignment
 go 1.16
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Masterminds/squirrel v1.5.2
 	github.com/getsentry/sentry-go v0.12.0
 	github.com/golang/mock v1.6.0
