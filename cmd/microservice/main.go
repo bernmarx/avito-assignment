@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"os"
 	"strconv"
@@ -40,7 +41,7 @@ func connectToDB() (*sql.DB, error) {
 func main() {
 	db, err := connectToDB()
 
-	//If connection to Postgres failed, wait for 3 seconds and try again
+	//If connection to DB failed, wait for 3 seconds and try again
 	if err != nil {
 		time.Sleep(time.Second * 3)
 
@@ -56,6 +57,10 @@ func main() {
 		Dsn:     os.Getenv("SENTRY_DSN"),
 		Release: os.Getenv("SENTRY_RELEASE"),
 	})
+
+	sentry.CaptureException(errors.New("my error"))
+
+	defer sentry.Flush(time.Second * 5)
 
 	if err != nil {
 		log.Logger().WithError(err).Fatal(err.Error())

@@ -30,6 +30,10 @@ func (s *Storage) GetBalance(account_id int, balance_id int) (float32, error) {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
+	if err != nil {
+		return 0.0, errors.New(err.Error(), 500)
+	}
+
 	var balance float32
 
 	err = tx.QueryRow(balance_select, args...).Scan(&balance)
