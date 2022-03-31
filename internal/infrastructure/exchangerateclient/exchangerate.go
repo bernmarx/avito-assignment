@@ -1,4 +1,5 @@
 //go:generate mockgen -source $GOFILE -destination ./exchangerate_mock.go -package $GOPACKAGE
+
 package exchangerateclient
 
 import (
@@ -8,12 +9,14 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-type HttpClient interface {
+// HTTPClientGetter provides access to making a request to 'url' with GET method
+type HTTPClientGetter interface {
 	Get(url string) (*http.Response, error)
 }
 
+// ExchangeRate is an entity that manages getting exchange rate for currencies
 type ExchangeRate struct {
-	HttpClient
+	HTTPClientGetter
 	url    string
 	curPos int
 }
@@ -22,10 +25,12 @@ type rate struct {
 	Value float32 `json:"conversion_rate"`
 }
 
-func NewExchangeRate(c HttpClient, _url string, _curPos int) *ExchangeRate {
-	return &ExchangeRate{HttpClient: c, url: _url, curPos: _curPos}
+// NewExchangeRate creates new ExchangeRate
+func NewExchangeRate(c HTTPClientGetter, _url string, _curPos int) *ExchangeRate {
+	return &ExchangeRate{HTTPClientGetter: c, url: _url, curPos: _curPos}
 }
 
+// GetExchangeRate returns exchange rate for 'cur' currency
 func (e *ExchangeRate) GetExchangeRate(cur string) (float32, error) {
 	url := e.url[:e.curPos] + cur + e.url[e.curPos:]
 	resp, err := e.Get(url)

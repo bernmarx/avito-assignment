@@ -5,12 +5,13 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) CheckAccountBalanceOwnership(accountId int, balanceId int) (bool, error) {
+// CheckAccountBalanceOwnership checks if 'accountID' owns 'balanceID'
+func (s *Storage) CheckAccountBalanceOwnership(accountID int, balanceID int) (bool, error) {
 
 	checkAccountBalanceOwnership, args, err := sq.
 		Select("*").
 		From("account_balance").
-		Where(sq.Eq{"account_id": accountId, "balance_id": balanceId}).
+		Where(sq.Eq{"account_id": accountID, "balance_id": balanceID}).
 		Prefix("SELECT EXISTS(").Suffix(")").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

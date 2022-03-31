@@ -4,6 +4,7 @@ import (
 	sql "database/sql"
 )
 
+// Storage represents access to the database layer
 type Storage struct {
 	database
 }
@@ -15,6 +16,7 @@ type database interface {
 	Begin() (*sql.Tx, error)
 }
 
+// NewStorage creates new Storage
 func NewStorage(db database) *Storage {
 	return &Storage{database: db}
 }

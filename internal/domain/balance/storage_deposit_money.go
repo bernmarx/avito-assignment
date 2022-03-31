@@ -7,7 +7,8 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) error {
+// DepositMoney deposits 'amount' to 'balanceID'
+func (s *Storage) DepositMoney(accountID int, balanceID int, amount float32) error {
 	tx, err := s.database.Begin()
 	if err != nil {
 		return errors.New(err.Error(), 503)
@@ -18,7 +19,7 @@ func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) err
 	accountUpsert, args, err := sq.
 		Insert("account").
 		Columns("id, created_at").
-		Values(accountId, time.Now().UTC()).
+		Values(accountID, time.Now().UTC()).
 		Suffix("ON CONFLICT (id) DO NOTHING").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -35,7 +36,7 @@ func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) err
 	balanceUpsert, args, err := sq.
 		Insert("balance").
 		Columns("id, balance, changed_at").
-		Values(balanceId, amount, time.Now().UTC()).
+		Values(balanceID, amount, time.Now().UTC()).
 		Suffix("ON CONFLICT (id) DO UPDATE SET balance = EXCLUDED.balance + balance.balance").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -52,7 +53,7 @@ func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) err
 	accountBalanceUpsert, args, err := sq.
 		Insert("account_balance").
 		Columns("account_id, balance_id").
-		Values(accountId, balanceId).
+		Values(accountID, balanceID).
 		Suffix("ON CONFLICT DO NOTHING").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -69,7 +70,7 @@ func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) err
 	balanceHistoryInsert, args, err := sq.
 		Insert("balance_history").
 		Columns("balance_id, operation, created_at, value").
-		Values(balanceId, "deposit", time.Now().UTC(), amount).
+		Values(balanceID, "deposit", time.Now().UTC(), amount).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 

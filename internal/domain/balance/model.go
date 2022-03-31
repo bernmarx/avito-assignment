@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 )
 
-type Transaction struct {
+type transaction struct {
 	Operation         string        `json:"operation"`
 	CreatedAt         string        `json:"created_at"`
 	Value             float32       `json:"value"`
@@ -13,7 +13,7 @@ type Transaction struct {
 	SenderAccountID   sql.NullInt64 `json:"sender_account_id"`
 }
 
-func (t *Transaction) GetJSON() ([]byte, error) {
+func (t *transaction) GetJSON() ([]byte, error) {
 	j, err := json.Marshal(t)
 	return j, err
 }

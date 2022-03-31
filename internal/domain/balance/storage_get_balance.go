@@ -5,8 +5,9 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) GetBalance(accountId int, balanceId int) (float32, error) {
-	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountId, balanceId)
+// GetBalance returns balance of 'balanceID'
+func (s *Storage) GetBalance(accountID int, balanceID int) (float32, error) {
+	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountID, balanceID)
 
 	if err != nil {
 		return 0.0, errors.New(err.Error(), 500)
@@ -26,7 +27,7 @@ func (s *Storage) GetBalance(accountId int, balanceId int) (float32, error) {
 	balanceSelect, args, err := sq.
 		Select("balance::numeric::float8").
 		From("balance").
-		Where(sq.Eq{"id": balanceId}).
+		Where(sq.Eq{"id": balanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 

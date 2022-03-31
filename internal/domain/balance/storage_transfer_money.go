@@ -7,10 +7,11 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
-	receiverAccountId int, receiverBalanceId int, amount float32) error {
+// TransferMoney transfers 'amount' from 'senderBalanceID' to 'receiverBalanceID'
+func (s *Storage) TransferMoney(senderAccountID int, senderBalanceID int,
+	receiverAccountID int, receiverBalanceID int, amount float32) error {
 
-	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(senderAccountId, senderBalanceId)
+	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(senderAccountID, senderBalanceID)
 
 	if err != nil {
 		return errors.New(err.Error(), 500)
@@ -20,7 +21,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 		return errors.New("sender_account_id does not own sender_balance_id", 200)
 	}
 
-	accountOwnsBalance, err = s.CheckAccountBalanceOwnership(receiverAccountId, receiverBalanceId)
+	accountOwnsBalance, err = s.CheckAccountBalanceOwnership(receiverAccountID, receiverBalanceID)
 
 	if err != nil {
 		return errors.New(err.Error(), 500)
@@ -30,7 +31,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 		return errors.New("receiver_account_id does not own receiver_balance_id", 200)
 	}
 
-	senderEnoughMoney, err := s.CheckBalanceEnoughMoney(senderBalanceId, amount)
+	senderEnoughMoney, err := s.CheckBalanceEnoughMoney(senderBalanceID, amount)
 
 	if err != nil {
 		return errors.New(err.Error(), 500)
@@ -50,7 +51,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 	updateSenderBalance, args, err := sq.
 		Update("balance").
 		Set("balance", sq.Expr("balance - ?::float8::numeric::money", amount)).
-		Where(sq.Eq{"id": senderBalanceId}).
+		Where(sq.Eq{"id": senderBalanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -66,7 +67,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 	updateReceiverBalance, args, err := sq.
 		Update("balance").
 		Set("balance", sq.Expr("balance + ?::float8::numeric::money", amount)).
-		Where(sq.Eq{"id": receiverBalanceId}).
+		Where(sq.Eq{"id": receiverBalanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -82,7 +83,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 	senderBalanceHistoryInsert, args, err := sq.
 		Insert("balance_history").
 		Columns("balance_id, operation, created_at, value, receiver_account_id, sender_account_id").
-		Values(senderBalanceId, "transfer", time.Now().UTC(), amount, receiverAccountId, senderAccountId).
+		Values(senderBalanceID, "transfer", time.Now().UTC(), amount, receiverAccountID, senderAccountID).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -98,7 +99,7 @@ func (s *Storage) TransferMoney(senderAccountId int, senderBalanceId int,
 	receiverBalanceHistoryInsert, args, err := sq.
 		Insert("balance_history").
 		Columns("balance_id, operation, created_at, value, receiver_account_id, sender_account_id").
-		Values(receiverBalanceId, "transfer", time.Now().UTC(), amount, receiverAccountId, senderAccountId).
+		Values(receiverBalanceID, "transfer", time.Now().UTC(), amount, receiverAccountID, senderAccountID).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 

@@ -14,6 +14,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/log"
 )
 
+// Handler for get_balance_history_page GET method
 func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
@@ -37,7 +38,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		b := balance.NewBalance(strg, eR)
 
-		j, err := b.Storage.GetBalanceHistory(rd.Account_id, rd.Balance_id, rd.Sort, page64)
+		j, err := b.Storage.GetBalanceHistory(rd.AccountID, rd.BalanceID, rd.Sort, page64)
 
 		if err != nil {
 			err := err.(*errors.Error)

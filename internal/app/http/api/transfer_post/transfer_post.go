@@ -10,6 +10,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/log"
 )
 
+// Handler for transfer POST method
 func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
@@ -20,8 +21,8 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		b := balance.NewBalance(strg, eR)
 
-		err := b.Storage.TransferMoney(rd.Sender_account_id, rd.Sender_balance_id,
-			rd.Receiver_account_id, rd.Receiver_balance_id, rd.Amount)
+		err := b.Storage.TransferMoney(rd.SenderAccountID, rd.SenderBalanceID,
+			rd.ReceiverAccountID, rd.ReceiverBalanceID, rd.Amount)
 
 		if err != nil {
 			err := err.(*errors.Error)

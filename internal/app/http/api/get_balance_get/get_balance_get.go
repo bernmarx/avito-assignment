@@ -10,6 +10,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/log"
 )
 
+// Handler for get_balance GET method
 func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
@@ -20,7 +21,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		b := balance.NewBalance(strg, eR)
 
-		balance, err := b.Storage.GetBalance(rd.Account_id, rd.Balance_id)
+		balance, err := b.Storage.GetBalance(rd.AccountID, rd.BalanceID)
 		if err != nil {
 			err := err.(*errors.Error)
 
@@ -44,9 +45,9 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 		}
 
 		response := api.Balance{
-			Account_id: rd.Account_id,
-			Balance_id: rd.Balance_id,
-			Balance:    balance,
+			AccountID: rd.AccountID,
+			BalanceID: rd.BalanceID,
+			Balance:   balance,
 		}
 
 		w.WriteHeader(http.StatusOK)

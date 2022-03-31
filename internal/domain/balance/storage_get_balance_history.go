@@ -9,8 +9,9 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, page int64) ([]byte, error) {
-	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountId, balanceId)
+// GetBalanceHistory return all transaction history of 'balanceID'
+func (s *Storage) GetBalanceHistory(accountID int, balanceID int, sort string, page int64) ([]byte, error) {
+	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountID, balanceID)
 
 	if err != nil {
 		return nil, errors.New(err.Error(), 500)
@@ -30,7 +31,7 @@ func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, p
 	balanceHistorySelectQuery := sq.
 		Select("operation::text, created_at, value::numeric::float8, receiver_account_id, sender_account_id").
 		From("balance_history").
-		Where(sq.Eq{"balance_id": balanceId})
+		Where(sq.Eq{"balance_id": balanceID})
 
 	switch sort {
 	case "date_asc":
@@ -63,10 +64,10 @@ func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, p
 		return nil, errors.New(err.Error(), 503)
 	}
 
-	var balanceHistory []Transaction
+	var balanceHistory []transaction
 
 	for rows.Next() {
-		var transaction Transaction
+		var transaction transaction
 		err = rows.Scan(&transaction.Operation,
 			&transaction.CreatedAt,
 			&transaction.Value,
