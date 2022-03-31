@@ -16,8 +16,12 @@ CREATE TABLE IF NOT EXISTS account_balance (
     balance_id INT REFERENCES balance(id) ON DELETE NO ACTION
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_account_balance ON account_balance (
-    account_id, balance_id
+CREATE UNIQUE INDEX IF NOT EXISTS idx_account_balance_account_id ON account_balance (
+    account_id
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_account_balance_balance_id ON account_balance (
+    balance_id
 );
 
 CREATE TABLE IF NOT EXISTS balance_history (
