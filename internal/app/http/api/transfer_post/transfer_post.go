@@ -20,7 +20,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		b := balance.NewBalance(strg, eR)
 
-		err := b.MakeTransfer(rd.Sender_account_id, rd.Sender_balance_id,
+		err := b.Storage.TransferMoney(rd.Sender_account_id, rd.Sender_balance_id,
 			rd.Receiver_account_id, rd.Receiver_balance_id, rd.Amount)
 
 		if err != nil {

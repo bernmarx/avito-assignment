@@ -90,10 +90,10 @@ func (mr *MockStorageAccessMockRecorder) GetBalance(account_id, balance_id inter
 }
 
 // GetBalanceHistory mocks base method
-func (m *MockStorageAccess) GetBalanceHistory(account_id, balance_id int, sort string, page int64) ([]Transaction, error) {
+func (m *MockStorageAccess) GetBalanceHistory(account_id, balance_id int, sort string, page int64) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBalanceHistory", account_id, balance_id, sort, page)
-	ret0, _ := ret[0].([]Transaction)
+	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

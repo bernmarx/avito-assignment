@@ -1,6 +1,7 @@
 package balance
 
 import (
+	"encoding/json"
 	"os"
 	"strconv"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, page int64) ([]Transaction, error) {
+func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, page int64) ([]byte, error) {
 	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountId, balanceId)
 
 	if err != nil {
@@ -79,5 +80,10 @@ func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, p
 		balanceHistory = append(balanceHistory, transaction)
 	}
 
-	return balanceHistory, tx.Commit()
+	j, err := json.Marshal(balanceHistory)
+	if err != nil {
+		return nil, err
+	}
+
+	return j, tx.Commit()
 }

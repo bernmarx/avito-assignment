@@ -20,7 +20,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		b := balance.NewBalance(strg, eR)
 
-		err := b.MakeDeposit(rd.Account_id, rd.Balance_id, rd.Amount)
+		err := b.Storage.DepositMoney(rd.Account_id, rd.Balance_id, rd.Amount)
 		if err != nil {
 			err := err.(*errors.Error)
 

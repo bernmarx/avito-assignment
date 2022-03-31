@@ -7,7 +7,7 @@ type StorageAccess interface {
 	TransferMoney(sender_account_id int, sender_balance_id int,
 		receiver_account_id int, receiver_balance_id int, amount float32) error
 	GetBalance(account_id int, balance_id int) (float32, error)
-	GetBalanceHistory(account_id int, balance_id int, sort string, page int64) ([]Transaction, error)
+	GetBalanceHistory(account_id int, balance_id int, sort string, page int64) ([]byte, error)
 }
 
 type ExchangeRateGetter interface {

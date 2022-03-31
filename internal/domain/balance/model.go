@@ -1,4 +1,3 @@
-//go:generate mockgen -source $GOFILE -destination ./storage_mock.go -package $GOPACKAGE
 package balance
 
 import (
