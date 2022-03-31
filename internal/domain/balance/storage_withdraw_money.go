@@ -8,25 +8,25 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) WithdrawMoney(account_id int, balance_id int, amount float32) error {
+func (s *Storage) WithdrawMoney(accountId int, balanceId int, amount float32) error {
 
-	account_owns_balance, err := s.CheckAccountBalanceOwnership(account_id, balance_id)
+	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountId, balanceId)
 
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	if !account_owns_balance {
+	if !accountOwnsBalance {
 		return errors.New("account_id does not own balance_id", 200)
 	}
 
-	balance_enough_money, err := s.CheckBalanceEnoughMoney(balance_id, amount)
+	balanceEnoughMoney, err := s.CheckBalanceEnoughMoney(balanceId, amount)
 
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	if !balance_enough_money {
+	if !balanceEnoughMoney {
 		return errors.New("not enough money on balance_id", 200)
 	}
 
@@ -37,10 +37,10 @@ func (s *Storage) WithdrawMoney(account_id int, balance_id int, amount float32) 
 
 	defer tx.Rollback()
 
-	update_balance, args, err := sq.
+	updateBalance, args, err := sq.
 		Update("balance").
 		Set("balance", sq.Expr("balance - ?::float8::numeric::money", amount)).
-		Where(sq.Eq{"id": balance_id}).
+		Where(sq.Eq{"id": balanceId}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -48,15 +48,15 @@ func (s *Storage) WithdrawMoney(account_id int, balance_id int, amount float32) 
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(update_balance, args...)
+	_, err = tx.Exec(updateBalance, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	balance_history_insert, args, err := sq.
+	balanceHistoryInsert, args, err := sq.
 		Insert("balance_history").
 		Columns("balance_id, operation, created_at, value").
-		Values(balance_id, "withdraw", time.Now().UTC(), amount).
+		Values(balanceId, "withdraw", time.Now().UTC(), amount).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -64,7 +64,7 @@ func (s *Storage) WithdrawMoney(account_id int, balance_id int, amount float32) 
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(balance_history_insert, args...)
+	_, err = tx.Exec(balanceHistoryInsert, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}

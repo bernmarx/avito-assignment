@@ -5,10 +5,10 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) CheckBalanceEnoughMoney(balance_id int, amount float32) (bool, error) {
-	check_balance_enough_money, args, err := sq.Select("*").
+func (s *Storage) CheckBalanceEnoughMoney(balanceId int, amount float32) (bool, error) {
+	checkBalanceEnoughMoney, args, err := sq.Select("*").
 		From("balance").
-		Where(sq.Eq{"id": balance_id}, sq.Expr("balance >= ?::float8::numeric::money", amount)).
+		Where(sq.Eq{"id": balanceId}, sq.Expr("balance >= ?::float8::numeric::money", amount)).
 		Prefix("SELECT EXISTS(").Suffix(")").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -17,9 +17,9 @@ func (s *Storage) CheckBalanceEnoughMoney(balance_id int, amount float32) (bool,
 		return false, errors.New(err.Error(), 500)
 	}
 
-	var balance_enough_money bool
+	var balanceEnoughMoney bool
 
-	err = s.database.QueryRow(check_balance_enough_money, args...).Scan(&balance_enough_money)
+	err = s.database.QueryRow(checkBalanceEnoughMoney, args...).Scan(&balanceEnoughMoney)
 
-	return balance_enough_money, err
+	return balanceEnoughMoney, err
 }

@@ -1,6 +1,49 @@
-version: '3.1'
+version: '3.4'
+
+x-environment:
+  &default-environment
+  DATABASE_URL: postgres://postgres:postgres@postgres:5433/postgres
+  SECRET_KEY: change_me
+  PORT: 8000
+x-depends_on:
+  &default-depends_on
+  - postgres
+  - redis
+
 
 services:
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    restart: unless-stopped
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"
+    command: -p 5433
+  redis:
+    image: redis
+    restart: unless-stopped
+  web:
+    image: glitchtip/glitchtip
+    depends_on: *default-depends_on
+    ports:
+      - "8000:8000"
+    environment: *default-environment
+    restart: unless-stopped
+  worker:
+    image: glitchtip/glitchtip
+    command: ./bin/run-celery-with-beat.sh
+    depends_on: *default-depends_on
+    environment: *default-environment
+    restart: unless-stopped
+  migrate:
+    image: glitchtip/glitchtip
+    depends_on: *default-depends_on
+    command: "./manage.py migrate"
+    environment: *default-environment
 
   db:
     build:
@@ -24,5 +67,8 @@ services:
       - ./.env
     depends_on:
       - db
+      - web
+      - worker
+      - migrate
     ports:
       - ${SERVICE_PORT}:${SERVICE_PORT}

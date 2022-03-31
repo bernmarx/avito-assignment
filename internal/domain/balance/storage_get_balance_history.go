@@ -8,15 +8,15 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) GetBalanceHistory(account_id int, balance_id int, sort string, page int64) ([]Transaction, error) {
-	account_owns_balance, err := s.CheckAccountBalanceOwnership(account_id, balance_id)
+func (s *Storage) GetBalanceHistory(accountId int, balanceId int, sort string, page int64) ([]Transaction, error) {
+	accountOwnsBalance, err := s.CheckAccountBalanceOwnership(accountId, balanceId)
 
 	if err != nil {
 		return nil, errors.New(err.Error(), 500)
 	}
 
-	if !account_owns_balance {
-		return nil, errors.New("accound_id does not own balance_id", 200)
+	if !accountOwnsBalance {
+		return nil, errors.New("account_id does not own balance_id", 200)
 	}
 
 	tx, err := s.database.Begin()
@@ -26,20 +26,20 @@ func (s *Storage) GetBalanceHistory(account_id int, balance_id int, sort string,
 
 	defer tx.Rollback()
 
-	balance_history_select_query := sq.
+	balanceHistorySelectQuery := sq.
 		Select("operation::text, created_at, value::numeric::float8, receiver_account_id, sender_account_id").
 		From("balance_history").
-		Where(sq.Eq{"balance_id": balance_id})
+		Where(sq.Eq{"balance_id": balanceId})
 
 	switch sort {
 	case "date_asc":
-		balance_history_select_query = balance_history_select_query.OrderBy("created_at ASC")
+		balanceHistorySelectQuery = balanceHistorySelectQuery.OrderBy("created_at ASC")
 	case "date_desc":
-		balance_history_select_query = balance_history_select_query.OrderBy("created_at DESC")
+		balanceHistorySelectQuery = balanceHistorySelectQuery.OrderBy("created_at DESC")
 	case "value_asc":
-		balance_history_select_query = balance_history_select_query.OrderBy("value ASC")
+		balanceHistorySelectQuery = balanceHistorySelectQuery.OrderBy("value ASC")
 	case "value_desc":
-		balance_history_select_query = balance_history_select_query.OrderBy("value DESC")
+		balanceHistorySelectQuery = balanceHistorySelectQuery.OrderBy("value DESC")
 	}
 
 	if page > 0 {
@@ -48,21 +48,21 @@ func (s *Storage) GetBalanceHistory(account_id int, balance_id int, sort string,
 			return nil, errors.New(err.Error(), 500)
 		}
 
-		balance_history_select_query = balance_history_select_query.Limit(uint64(limit)).Offset(uint64(limit * (page - 1)))
+		balanceHistorySelectQuery = balanceHistorySelectQuery.Limit(uint64(limit)).Offset(uint64(limit * (page - 1)))
 	}
 
-	balance_history_select, args, err := balance_history_select_query.PlaceholderFormat(sq.Dollar).ToSql()
+	balanceHistorySelect, args, err := balanceHistorySelectQuery.PlaceholderFormat(sq.Dollar).ToSql()
 
 	if err != nil {
 		return nil, errors.New(err.Error(), 500)
 	}
 
-	rows, err := tx.Query(balance_history_select, args...)
+	rows, err := tx.Query(balanceHistorySelect, args...)
 	if err != nil {
 		return nil, errors.New(err.Error(), 503)
 	}
 
-	var balance_history []Transaction
+	var balanceHistory []Transaction
 
 	for rows.Next() {
 		var transaction Transaction
@@ -76,8 +76,8 @@ func (s *Storage) GetBalanceHistory(account_id int, balance_id int, sort string,
 			return nil, errors.New(err.Error(), 500)
 		}
 
-		balance_history = append(balance_history, transaction)
+		balanceHistory = append(balanceHistory, transaction)
 	}
 
-	return balance_history, tx.Commit()
+	return balanceHistory, tx.Commit()
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) error {
+func (s *Storage) DepositMoney(accountId int, balanceId int, amount float32) error {
 	tx, err := s.database.Begin()
 	if err != nil {
 		return errors.New(err.Error(), 503)
@@ -15,10 +15,10 @@ func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) e
 
 	defer tx.Rollback()
 
-	account_upsert, args, err := sq.
+	accountUpsert, args, err := sq.
 		Insert("account").
 		Columns("id, created_at").
-		Values(account_id, time.Now().UTC()).
+		Values(accountId, time.Now().UTC()).
 		Suffix("ON CONFLICT (id) DO NOTHING").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -27,15 +27,15 @@ func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) e
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(account_upsert, args...)
+	_, err = tx.Exec(accountUpsert, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	balance_upsert, args, err := sq.
+	balanceUpsert, args, err := sq.
 		Insert("balance").
 		Columns("id, balance, changed_at").
-		Values(balance_id, amount, time.Now().UTC()).
+		Values(balanceId, amount, time.Now().UTC()).
 		Suffix("ON CONFLICT (id) DO UPDATE SET balance = EXCLUDED.balance + balance.balance").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -44,15 +44,15 @@ func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) e
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(balance_upsert, args...)
+	_, err = tx.Exec(balanceUpsert, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	account_balance_upsert, args, err := sq.
+	accountBalanceUpsert, args, err := sq.
 		Insert("account_balance").
 		Columns("account_id, balance_id").
-		Values(account_id, balance_id).
+		Values(accountId, balanceId).
 		Suffix("ON CONFLICT DO NOTHING").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -61,15 +61,15 @@ func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) e
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(account_balance_upsert, args...)
+	_, err = tx.Exec(accountBalanceUpsert, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}
 
-	balance_history_insert, args, err := sq.
+	balanceHistoryInsert, args, err := sq.
 		Insert("balance_history").
 		Columns("balance_id, operation, created_at, value").
-		Values(balance_id, "deposit", time.Now().UTC(), amount).
+		Values(balanceId, "deposit", time.Now().UTC(), amount).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -77,7 +77,7 @@ func (s *Storage) DepositMoney(account_id int, balance_id int, amount float32) e
 		return errors.New(err.Error(), 500)
 	}
 
-	_, err = tx.Exec(balance_history_insert, args...)
+	_, err = tx.Exec(balanceHistoryInsert, args...)
 	if err != nil {
 		return errors.New(err.Error(), 500)
 	}

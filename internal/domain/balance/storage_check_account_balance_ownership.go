@@ -5,12 +5,12 @@ import (
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
 )
 
-func (s *Storage) CheckAccountBalanceOwnership(account_id int, balance_id int) (bool, error) {
+func (s *Storage) CheckAccountBalanceOwnership(accountId int, balanceId int) (bool, error) {
 
-	check_account_balance_ownership, args, err := sq.
+	checkAccountBalanceOwnership, args, err := sq.
 		Select("*").
 		From("account_balance").
-		Where(sq.Eq{"account_id": account_id, "balance_id": balance_id}).
+		Where(sq.Eq{"account_id": accountId, "balance_id": balanceId}).
 		Prefix("SELECT EXISTS(").Suffix(")").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -19,9 +19,9 @@ func (s *Storage) CheckAccountBalanceOwnership(account_id int, balance_id int) (
 		return false, errors.New(err.Error(), 500)
 	}
 
-	var account_owns_balance bool
+	var accountOwnsBalance bool
 
-	err = s.database.QueryRow(check_account_balance_ownership, args...).Scan(&account_owns_balance)
+	err = s.database.QueryRow(checkAccountBalanceOwnership, args...).Scan(&accountOwnsBalance)
 
-	return account_owns_balance, err
+	return accountOwnsBalance, err
 }
