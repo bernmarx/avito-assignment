@@ -25,7 +25,7 @@ func (s *Storage) GetBalance(accountID int, balanceID int) (float32, error) {
 	defer tx.Rollback()
 
 	balanceSelect, args, err := sq.
-		Select("balance::numeric::float8").
+		Select("balance").
 		From("balance").
 		Where(sq.Eq{"id": balanceID}).
 		PlaceholderFormat(sq.Dollar).

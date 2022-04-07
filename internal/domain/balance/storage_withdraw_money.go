@@ -40,7 +40,7 @@ func (s *Storage) WithdrawMoney(accountID int, balanceID int, amount float32) er
 
 	updateBalance, args, err := sq.
 		Update("balance").
-		Set("balance", sq.Expr("balance - ?::float8::numeric::money", amount)).
+		Set("balance", sq.Expr("balance - ?::numeric", amount)).
 		Where(sq.Eq{"id": balanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

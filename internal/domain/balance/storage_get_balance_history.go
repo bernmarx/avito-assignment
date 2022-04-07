@@ -29,7 +29,7 @@ func (s *Storage) GetBalanceHistory(accountID int, balanceID int, sort string, p
 	defer tx.Rollback()
 
 	balanceHistorySelectQuery := sq.
-		Select("operation::text, created_at, value::numeric::float8, receiver_account_id, sender_account_id").
+		Select("operation::text, created_at, value, receiver_account_id, sender_account_id").
 		From("balance_history").
 		Where(sq.Eq{"balance_id": balanceID})
 

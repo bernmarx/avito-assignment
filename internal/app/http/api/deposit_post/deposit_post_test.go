@@ -1,7 +1,6 @@
 package deposit_post
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/bernmarx/avito-assignment/internal/domain/balance"
 	"github.com/bernmarx/avito-assignment/internal/infrastructure/errors"
-	"github.com/bernmarx/avito-assignment/internal/infrastructure/exchangerateclient"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,15 +19,7 @@ func TestHander(t *testing.T) {
 
 	s := balance.NewMockStorageAccess(ctrl)
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `
-		{"conversion_rate":2.0}
-		`)
-	}))
-
-	eR := exchangerateclient.NewExchangeRate(http.DefaultClient, ts.URL, 0)
-
-	handler := http.HandlerFunc(Handler(s, eR))
+	handler := http.HandlerFunc(Handler(s))
 
 	s.EXPECT().DepositMoney(10, 20, float32(15.0)).Return(nil)
 

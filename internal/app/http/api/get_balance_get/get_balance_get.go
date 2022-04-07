@@ -19,7 +19,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		json.NewDecoder(r.Body).Decode(&rd)
 
-		b := balance.NewBalance(strg, eR)
+		b := balance.NewBalance(strg)
 
 		balance, err := b.Storage.GetBalance(rd.AccountID, rd.BalanceID)
 		if err != nil {

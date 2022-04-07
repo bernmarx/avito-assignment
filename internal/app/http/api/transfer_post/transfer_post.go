@@ -11,7 +11,7 @@ import (
 )
 
 // Handler for transfer POST method
-func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
+func Handler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -19,7 +19,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 
 		json.NewDecoder(r.Body).Decode(&rd)
 
-		b := balance.NewBalance(strg, eR)
+		b := balance.NewBalance(strg)
 
 		err := b.Storage.TransferMoney(rd.SenderAccountID, rd.SenderBalanceID,
 			rd.ReceiverAccountID, rd.ReceiverBalanceID, rd.Amount)

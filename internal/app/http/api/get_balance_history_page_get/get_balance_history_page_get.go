@@ -15,7 +15,7 @@ import (
 )
 
 // Handler for get_balance_history_page GET method
-func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w http.ResponseWriter, r *http.Request) {
+func Handler(strg balance.StorageAccess) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 
@@ -36,7 +36,7 @@ func Handler(strg balance.StorageAccess, eR balance.ExchangeRateGetter) func(w h
 			return
 		}
 
-		b := balance.NewBalance(strg, eR)
+		b := balance.NewBalance(strg)
 
 		j, err := b.Storage.GetBalanceHistory(rd.AccountID, rd.BalanceID, rd.Sort, page64)
 

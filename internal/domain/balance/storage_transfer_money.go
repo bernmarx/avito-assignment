@@ -50,7 +50,7 @@ func (s *Storage) TransferMoney(senderAccountID int, senderBalanceID int,
 
 	updateSenderBalance, args, err := sq.
 		Update("balance").
-		Set("balance", sq.Expr("balance - ?::float8::numeric::money", amount)).
+		Set("balance", sq.Expr("balance - ?::numeric", amount)).
 		Where(sq.Eq{"id": senderBalanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -66,7 +66,7 @@ func (s *Storage) TransferMoney(senderAccountID int, senderBalanceID int,
 
 	updateReceiverBalance, args, err := sq.
 		Update("balance").
-		Set("balance", sq.Expr("balance + ?::float8::numeric::money", amount)).
+		Set("balance", sq.Expr("balance + ?::numeric", amount)).
 		Where(sq.Eq{"id": receiverBalanceID}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

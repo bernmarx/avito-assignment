@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS account (
 
 CREATE TABLE IF NOT EXISTS balance (
     id INT PRIMARY KEY,
-    balance MONEY NOT NULL CONSTRAINT non_negative_balance CHECK(balance::money::numeric::float8 >= 0),
+    balance DECIMAL(21, 2) NOT NULL CONSTRAINT non_negative_balance CHECK(balance::numeric >= 0),
     changed_at TIMESTAMP WITH TIME ZONE
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS balance_history (
     balance_id INT REFERENCES balance(id),
     operation operation_type,
     created_at TIMESTAMP WITH TIME ZONE,
-    value MONEY NOT NULL CONSTRAINT positive_value CHECK(value::money::numeric::float8 > 0),
+    value DECIMAL(21, 2) NOT NULL CONSTRAINT positive_value CHECK(value::numeric > 0),
     receiver_account_id INT,
     sender_account_id INT
 );

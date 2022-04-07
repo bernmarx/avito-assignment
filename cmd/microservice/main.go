@@ -76,12 +76,12 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/deposit", deposit_post.Handler(s, eR)).Methods("POST")
-	r.HandleFunc("/withdraw", withdraw_post.Handler(s, eR)).Methods("POST")
-	r.HandleFunc("/transfer", transfer_post.Handler(s, eR)).Methods("POST")
+	r.HandleFunc("/deposit", deposit_post.Handler(s)).Methods("POST")
+	r.HandleFunc("/withdraw", withdraw_post.Handler(s)).Methods("POST")
+	r.HandleFunc("/transfer", transfer_post.Handler(s)).Methods("POST")
 	r.HandleFunc("/balance", get_balance_get.Handler(s, eR)).Methods("GET")
-	r.HandleFunc("/history", get_balance_history_get.Handler(s, eR)).Methods("GET")
-	r.HandleFunc("/history/{page}", get_balance_history_page_get.Handler(s, eR)).Methods("GET")
+	r.HandleFunc("/history", get_balance_history_get.Handler(s)).Methods("GET")
+	r.HandleFunc("/history/{page}", get_balance_history_page_get.Handler(s)).Methods("GET")
 
 	http.Handle("/", r)
 
