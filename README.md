@@ -66,17 +66,24 @@ HTTP API принимает запросы и возвращает ответы 
 
 Возвращает всю историю транзакций balance_id (т.е. самого кошелька)
 
-![History](https://user-images.githubusercontent.com/78679173/162112412-bf77b501-fe32-4625-8797-2e5a4b0c56a2.png)
+Поддерживает сортировку по возрастанию и убыванию по дате транзакции и её сумме (указывать её необязательно):
+
+- "date_asc", "date_desc" - сортировка транзакций по дате
+- "value_asc", "value_desc" - сортировка транзакций по сумме
+
+![History](https://user-images.githubusercontent.com/78679173/162168782-ad6f1c06-b721-4f21-b56d-e000cca2ef96.png)
 
 Пример ответа:
 
-![HistoryResponse](https://user-images.githubusercontent.com/78679173/162112437-16e4559f-603e-4f26-aba1-d665a55d5c94.png)
+![HistoryResponse](https://user-images.githubusercontent.com/78679173/162168789-a16d8aa4-bd75-4bb9-add9-01a2ded9e15c.png)
 
 ### /history/{page}
 
 Метод: GET
 
 Возвращает {page} страницу из истории транзакций balance_id (т.е. самого кошелька)
+
+Сортировка работает аналогично /history
 
 Количество записей на страницу можно поменять в .env перед деплоем, изменив MAX_HISTORY_PAGE_LEN
 
